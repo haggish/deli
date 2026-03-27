@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Boot: api-gateway" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+        <module name="deli.services.api-gateway.main" />
+        <option name="SPRING_BOOT_MAIN_CLASS" value="com.deli.gateway.ApiGatewayApplicationKt" />
+        <option name="ACTIVE_PROFILES" value="local" />
+        <envs>
+            <env name="SPRING_PROFILES_ACTIVE" value="local" />
+        </envs>
+        <method v="2">
+            <option name="Make" enabled="true" />
+        </method>
+    </configuration>
+</component>

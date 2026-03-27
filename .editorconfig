@@ -1,0 +1,48 @@
+root = true
+
+# ── All files ─────────────────────────────────────────────────────────────────
+[*]
+charset                  = utf-8
+end_of_line              = lf          # LF everywhere — critical for WSL/Windows interop
+indent_style             = space
+insert_final_newline     = true
+trim_trailing_whitespace = true
+
+# ── Kotlin ────────────────────────────────────────────────────────────────────
+[*.{kt,kts}]
+indent_size              = 4
+max_line_length          = 120
+ij_kotlin_imports_layout = *,java.**,javax.**,kotlin.**,^
+
+# ── YAML (Kubernetes / Helm / Spring application.yml) ─────────────────────────
+[*.{yml,yaml}]
+indent_size              = 2
+
+# ── JSON ──────────────────────────────────────────────────────────────────────
+[*.json]
+indent_size              = 2
+
+# ── Gradle ────────────────────────────────────────────────────────────────────
+[*.gradle.kts]
+indent_size              = 4
+
+# ── Markdown ──────────────────────────────────────────────────────────────────
+[*.md]
+trim_trailing_whitespace = false        # Trailing spaces are significant in Markdown
+
+# ── Shell scripts ─────────────────────────────────────────────────────────────
+[*.sh]
+indent_size              = 2
+end_of_line              = lf
+
+# ── Dockerfiles ───────────────────────────────────────────────────────────────
+[Dockerfile*]
+indent_size              = 4
+
+# ── Helm / Kubernetes templates ───────────────────────────────────────────────
+[*.{yaml,yml}]
+indent_size              = 2
+
+# ── TypeScript / Angular (mobile-app) ────────────────────────────────────────
+[mobile-app/**/*.{ts,html,scss,css}]
+indent_size              = 2

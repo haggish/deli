@@ -1,0 +1,54 @@
+# ── Gradle ────────────────────────────────────────────────────────────────────
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ── IntelliJ IDEA ─────────────────────────────────────────────────────────────
+# Exclude user-specific IDEA files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/*.iml
+*.iml
+*.iws
+*.ipr
+out/
+
+# Keep these — shared project config that every developer needs
+# .idea/runConfigurations/   ← DO NOT ignore
+# .idea/codeStyles/          ← DO NOT ignore
+# .idea/inspectionProfiles/  ← DO NOT ignore
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Environment / Secrets — NEVER commit these ────────────────────────────────
+.env
+.env.local
+.env.*.local
+**/src/main/resources/application-local.yml
+**/src/main/resources/application-secrets.yml
+secrets/
+
+# ── Node.js (mobile-app) ──────────────────────────────────────────────────────
+mobile-app/node_modules/
+mobile-app/.angular/
+mobile-app/dist/
+mobile-app/www/
+mobile-app/android/
+mobile-app/.capacitor/
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+**/Dockerfile.local
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Test outputs ─────────────────────────────────────────────────────────────
+**/test-results/
+**/reports/

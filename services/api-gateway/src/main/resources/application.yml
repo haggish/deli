@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true     # exposes /actuator/health/liveness and /actuator/health/readiness
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.deli: DEBUG
+
+---
+# ── Local profile (Docker Desktop / WSL 2) ────────────────────────────────────
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  cloud:
+    gateway:
+      routes:
+        - id: route-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/routes/**
+          filters:
+            - StripPrefix=1
+
+        - id: delivery-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/deliveries/**
+          filters:
+            - StripPrefix=1
+
+        - id: location-service-http
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/locations/**
+          filters:
+            - StripPrefix=1
+
+        - id: notification-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"    # Angular dev server
+              - "capacitor://localhost"    # Capacitor Android WebView
+            allowedMethods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
+            allowedHeaders: ["*"]
+            allowCredentials: true
+
+deli:
+  jwt:
+    secret: "local-dev-secret-change-in-production-must-be-at-least-256-bits-long"
+    expiry-minutes: 60
+    refresh-expiry-days: 30
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.cloud.gateway: DEBUG

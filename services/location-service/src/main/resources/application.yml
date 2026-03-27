@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: location-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.deli: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  # TimescaleDB — same PostgreSQL driver, different database
+  datasource:
+    url: jdbc:postgresql://localhost:5433/gpsdb     # port 5433 — TimescaleDB mapped separately
+    username: gps_user
+    password: gps_pass_local
+    hikari:
+      maximum-pool-size: 10           # Higher — GPS ingest is write-heavy
+      minimum-idle: 3
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1                         # GPS events: favour throughput over strict durability
+      properties:
+        spring.json.add.type.headers: false
+        linger.ms: 50                 # Batch GPS events for 50ms before flushing
+        batch.size: 32768
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: redis_local
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          min-idle: 2
+
+deli:
+  jwt:
+    secret: "local-dev-secret-change-in-production-must-be-at-least-256-bits-long"
+  gps:
+    batch-size: 20
+    batch-flush-ms: 5000
+    courier-position-ttl-seconds: 60
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web.socket: DEBUG
