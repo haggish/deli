@@ -15,7 +15,7 @@ management:
   endpoint:
     health:
       probes:
-        enabled: true     # exposes /actuator/health/liveness and /actuator/health/readiness
+        enabled: true
       show-details: always
 
 logging:
@@ -24,11 +24,26 @@ logging:
     com.deli: DEBUG
 
 ---
-# ── Local profile (Docker Desktop / WSL 2) ────────────────────────────────────
 spring:
   config:
     activate:
       on-profile: local
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/courierdb
+    username: courier_user
+    password: courier_pass_local
+    pool:
+      max-size: 10
+      initial-size: 2
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/courierdb
+    user: courier_user
+    password: courier_pass_local
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
   cloud:
     gateway:
@@ -37,36 +52,25 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/api/routes/**
-          filters:
-            - StripPrefix=1
-
         - id: delivery-service
           uri: http://localhost:8082
           predicates:
             - Path=/api/deliveries/**
-          filters:
-            - StripPrefix=1
-
         - id: location-service-http
           uri: http://localhost:8083
           predicates:
             - Path=/api/locations/**
-          filters:
-            - StripPrefix=1
-
         - id: notification-service
           uri: http://localhost:8084
           predicates:
             - Path=/api/notifications/**
-          filters:
-            - StripPrefix=1
-
       globalcors:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://localhost:4200"    # Angular dev server
-              - "capacitor://localhost"    # Capacitor Android WebView
+              - "http://localhost:4200"
+              - "http://localhost:8100"
+              - "capacitor://localhost"
             allowedMethods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
             allowedHeaders: ["*"]
             allowCredentials: true
@@ -81,3 +85,51 @@ logging:
   level:
     root: DEBUG
     org.springframework.cloud.gateway: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: kubernetes
+
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    pool:
+      max-size: 20
+      initial-size: 5
+
+  flyway:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  cloud:
+    gateway:
+      routes:
+        - id: route-service
+          uri: http://deli-route-service:8080
+          predicates:
+            - Path=/api/routes/**
+        - id: delivery-service
+          uri: http://deli-delivery-service:8080
+          predicates:
+            - Path=/api/deliveries/**
+        - id: location-service-http
+          uri: http://deli-location-service:8080
+          predicates:
+            - Path=/api/locations/**
+        - id: notification-service
+          uri: http://deli-notification-service:8080
+          predicates:
+            - Path=/api/notifications/**
+
+deli:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiry-minutes: 60
+    refresh-expiry-days: 30

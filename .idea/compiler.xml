@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="21" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="deli.services.api-gateway" options="-parameters" />
+      <module name="deli.services.api-gateway.main" options="-parameters" />
+      <module name="deli.services.api-gateway.test" options="-parameters" />
+      <module name="deli.services.delivery-service" options="-parameters" />
+      <module name="deli.services.delivery-service.main" options="-parameters" />
+      <module name="deli.services.delivery-service.test" options="-parameters" />
+      <module name="deli.services.location-service" options="-parameters" />
+      <module name="deli.services.location-service.main" options="-parameters" />
+      <module name="deli.services.location-service.test" options="-parameters" />
+      <module name="deli.services.notification-service" options="-parameters" />
+      <module name="deli.services.notification-service.main" options="-parameters" />
+      <module name="deli.services.notification-service.test" options="-parameters" />
+      <module name="deli.services.route-service" options="-parameters" />
+      <module name="deli.services.route-service.main" options="-parameters" />
+      <module name="deli.services.route-service.test" options="-parameters" />
+    </option>
+  </component>
+</project>

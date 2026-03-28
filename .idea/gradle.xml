@@ -4,8 +4,34 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="openjdk-21" />
+        <option name="gradleJvm" value="temurin-21 (2)" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/services" />
+            <option value="$PROJECT_DIR$/services/api-gateway" />
+            <option value="$PROJECT_DIR$/services/delivery-service" />
+            <option value="$PROJECT_DIR$/services/location-service" />
+            <option value="$PROJECT_DIR$/services/notification-service" />
+            <option value="$PROJECT_DIR$/services/route-service" />
+            <option value="$PROJECT_DIR$/shared" />
+            <option value="$PROJECT_DIR$/shared/common-api" />
+            <option value="$PROJECT_DIR$/shared/domain-model" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
