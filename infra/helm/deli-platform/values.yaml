@@ -1,0 +1,43 @@
+global:
+  storageClass: "standard"
+
+kafka:
+  replicaCount: 3
+  kraft:
+    enabled: true
+  persistence:
+    size: 100Gi
+
+postgresql:
+  auth:
+    username: courier_user
+    database: courierdb
+  primary:
+    persistence:
+      size: 100Gi
+  readReplicas:
+    replicaCount: 1
+
+timescaledb:
+  auth:
+    username: gps_user
+    database: gpsdb
+  primary:
+    persistence:
+      size: 500Gi
+  readReplicas:
+    replicaCount: 0
+
+redis:
+  auth:
+    enabled: true
+  master:
+    persistence:
+      enabled: false
+  replica:
+    replicaCount: 1
+
+minio:
+  persistence:
+    size: 50Gi
+  defaultBuckets: "delivery-proof-photos,delivery-signatures"

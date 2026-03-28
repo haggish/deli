@@ -1,0 +1,5 @@
+apiVersion: v2
+name: deli-common
+description: Shared Helm template library for Deli microservices
+type: library
+version: 0.1.0

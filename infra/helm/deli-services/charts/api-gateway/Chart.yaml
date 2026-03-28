@@ -1,0 +1,10 @@
+apiVersion: v2
+name: api-gateway
+description: Helm chart for the Deli api-gateway
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: deli-common
+    version: "0.1.0"
+    repository: "file://../deli-common"

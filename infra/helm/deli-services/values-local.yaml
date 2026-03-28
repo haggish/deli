@@ -1,0 +1,97 @@
+# values-local.yaml for deli-services
+# Apply after deli-platform is healthy:
+#   helm upgrade --install deli-services ./infra/helm/deli-services \
+#     -f ./infra/helm/deli-services/values-local.yaml \
+#     -n delivery
+
+# ── Shared secrets (referenced by all services) ───────────────────────────────
+# In production use Sealed Secrets or External Secrets Operator.
+# For local dev these are plain values.
+global:
+  jwtSecret: "local-dev-secret-change-in-production-must-be-at-least-256-bits-long"
+  postgresPassword: "courier_pass_local"
+  timescalePassword: "gps_pass_local"
+  redisPassword: "redis_local"
+  s3AccessKey: "minioadmin"
+  s3SecretKey: "minioadmin"
+  mapsApiKey: "local-placeholder"
+  fcmDryRun: "true"             # Log FCM notifications instead of sending them
+
+# ── api-gateway ───────────────────────────────────────────────────────────────
+api-gateway:
+  replicaCount: 1
+  image:
+    repository: deli/api-gateway
+    tag: local
+    pullPolicy: Never           # Use locally built image — never pull from registry
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  service:
+    type: ClusterIP
+    httpPort: 80
+    wsPort: 81
+
+# ── route-service ─────────────────────────────────────────────────────────────
+route-service:
+  replicaCount: 1
+  image:
+    repository: deli/route-service
+    tag: local
+    pullPolicy: Never
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── delivery-service ──────────────────────────────────────────────────────────
+delivery-service:
+  replicaCount: 1
+  image:
+    repository: deli/delivery-service
+    tag: local
+    pullPolicy: Never
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ── location-service ──────────────────────────────────────────────────────────
+location-service:
+  replicaCount: 1
+  image:
+    repository: deli/location-service
+    tag: local
+    pullPolicy: Never
+  resources:
+    requests:
+      cpu: 150m
+      memory: 384Mi
+    limits:
+      cpu: 700m
+      memory: 768Mi
+
+# ── notification-service ──────────────────────────────────────────────────────
+notification-service:
+  replicaCount: 1
+  image:
+    repository: deli/notification-service
+    tag: local
+    pullPolicy: Never
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 400m
+      memory: 384Mi

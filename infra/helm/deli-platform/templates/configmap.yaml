@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: deli-platform
+data:
+  # ── Kafka ──────────────────────────────────────────────────────────────────
+  KAFKA_BOOTSTRAP_SERVERS: "{{ .Release.Name }}-kafka:9092"
+  KAFKA_CONSUMER_GROUP_PREFIX: "courier-platform"
+
+  # ── Kafka topic names (must match provisioning in values) ──────────────────
+  KAFKA_TOPIC_LOCATION_UPDATED:   "location.updated"
+  KAFKA_TOPIC_ROUTE_UPDATED:      "route.updated"
+  KAFKA_TOPIC_STOP_ASSIGNED:      "stop.assigned"
+  KAFKA_TOPIC_DELIVERY_CONFIRMED: "delivery.confirmed"
+  KAFKA_TOPIC_DELIVERY_FAILED:    "delivery.failed"
+  KAFKA_TOPIC_SHIFT_STARTED:      "shift.started"
+  KAFKA_TOPIC_SHIFT_COMPLETED:    "shift.completed"
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB:   "courierdb"
+
+  # ── TimescaleDB ────────────────────────────────────────────────────────────
+  TIMESCALE_HOST: "{{ .Release.Name }}-timescaledb"
+  TIMESCALE_PORT: "5433"
+  TIMESCALE_DB:   "gpsdb"
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  REDIS_HOST: "{{ .Release.Name }}-redis-master"
+  REDIS_PORT: "6379"
+
+  # ── MinIO / S3 ─────────────────────────────────────────────────────────────
+  S3_ENDPOINT:          "http://{{ .Release.Name }}-minio:9000"
+  S3_BUCKET_PHOTOS:     "delivery-proof-photos"
+  S3_BUCKET_SIGNATURES: "delivery-signatures"
+
+  # ── Spring Boot ────────────────────────────────────────────────────────────
+  SPRING_PROFILES_ACTIVE: "kubernetes"
+  LOG_LEVEL:              "INFO"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus"
+
+  # ── GPS batching ───────────────────────────────────────────────────────────
+  GPS_BATCH_SIZE:     "20"
+  GPS_BATCH_FLUSH_MS: "5000"
+  REDIS_COURIER_LOCATION_TTL: "60"
+
+  # ── S3 presigned URL expiry ────────────────────────────────────────────────
+  S3_PRESIGNED_URL_EXPIRY: "300"

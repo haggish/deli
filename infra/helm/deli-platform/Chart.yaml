@@ -1,0 +1,8 @@
+apiVersion: v2
+name: deli-platform
+description: >
+  Umbrella Helm chart for the Deli courier platform infrastructure.
+  Uses official upstream images with stable, predictable tags.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

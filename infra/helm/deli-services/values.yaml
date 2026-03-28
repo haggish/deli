@@ -1,0 +1,9 @@
+global:
+  jwtSecret: "change-me-in-production"
+  postgresPassword: "change-me"
+  timescalePassword: "change-me"
+  redisPassword: "change-me"
+  s3AccessKey: "change-me"
+  s3SecretKey: "change-me"
+  mapsApiKey: "change-me"
+  fcmDryRun: "true"

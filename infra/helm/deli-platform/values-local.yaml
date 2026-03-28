@@ -1,0 +1,3 @@
+# Local development values for deli-platform.
+# All infrastructure is defined directly in templates/ using official images.
+# No sub-chart configuration needed.

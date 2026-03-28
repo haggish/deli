@@ -1,0 +1,48 @@
+replicaCount: 1
+image:
+  repository: deli/location-service
+  tag: local
+  pullPolicy: Never
+service:
+  port: 8080
+  wsPort: 8081
+readinessProbe:
+  initialDelaySeconds: 30
+livenessProbe:
+  initialDelaySeconds: 45
+terminationGracePeriodSeconds: 60
+resources:
+  requests:
+    cpu: 150m
+    memory: 384Mi
+  limits:
+    cpu: 700m
+    memory: 768Mi
+extraEnv:
+  - name: SPRING_APPLICATION_NAME
+    value: "location-service"
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: platform-secrets
+        key: JWT_SECRET
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: platform-secrets
+        key: TIMESCALE_PASSWORD
+  - name: SPRING_DATA_REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: platform-secrets
+        key: REDIS_PASSWORD
+initContainers:
+  - name: wait-for-timescale
+    image: busybox:1.36
+    command: ['sh', '-c', 'until nc -z $(TIMESCALE_HOST) $(TIMESCALE_PORT); do echo waiting; sleep 3; done']
+    envFrom:
+      - configMapRef:
+          name: platform-config
+  - name: wait-for-kafka
+    image: busybox:1.36
+    command: ['sh', '-c', 'until nc -z deli-platform-kafka 9092; do echo waiting; sleep 3; done']

@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: deli/api-gateway
+  tag: local
+  pullPolicy: Never
+
+service:
+  port: 8080
+  wsPort: 8081
+
+readinessProbe:
+  initialDelaySeconds: 30
+livenessProbe:
+  initialDelaySeconds: 45
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+extraEnv:
+  - name: SPRING_APPLICATION_NAME
+    value: "api-gateway"
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: platform-secrets
+        key: JWT_SECRET
+  - name: GATEWAY_ROUTE_SERVICE_URL
+    value: "http://deli-route-service:8080"
+  - name: GATEWAY_DELIVERY_SERVICE_URL
+    value: "http://deli-delivery-service:8080"
+  - name: GATEWAY_LOCATION_SERVICE_URL
+    value: "http://deli-location-service:8080"
+  - name: GATEWAY_NOTIFICATION_SERVICE_URL
+    value: "http://deli-notification-service:8080"
