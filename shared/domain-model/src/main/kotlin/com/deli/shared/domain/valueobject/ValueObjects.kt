@@ -93,7 +93,7 @@ value class ShiftId(
     companion object {
         fun new(): ShiftId = ShiftId(UUID.randomUUID())
 
-        fun of(value: String): ShiftId = ShiftId(UUID.fromString(value))
+        fun of(value: UUID): ShiftId = ShiftId(value)
     }
 
     override fun toString(): String = value.toString()

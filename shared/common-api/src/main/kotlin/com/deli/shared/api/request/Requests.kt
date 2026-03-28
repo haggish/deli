@@ -159,3 +159,11 @@ data class StartShiftRequest(
     @field:NotBlank
     val scheduledDate: String, // ISO date: "2025-04-01"
 )
+
+data class AddStopRequest(
+    val packageId: String,
+    val customerId: String,
+    val address: com.deli.shared.api.request.AddressRequest,
+    val latitude: Double,
+    val longitude: Double,
+)
