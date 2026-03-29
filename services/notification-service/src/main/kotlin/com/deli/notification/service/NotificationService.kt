@@ -19,21 +19,23 @@ class NotificationService(
         trackingNumber: String,
         placement: String,
     ) {
-        val token = customerFcmToken ?: run {
-            log.debug("No FCM token for customer — skipping delivery confirmed notification")
-            return
-        }
+        val token =
+            customerFcmToken ?: run {
+                log.debug("No FCM token for customer — skipping delivery confirmed notification")
+                return
+            }
 
         send(
             PushNotification(
                 recipientFcmToken = token,
                 title = "Package delivered ✓",
                 body = "Your package $trackingNumber has been delivered ($placement).",
-                data = mapOf(
-                    "type" to "DELIVERY_CONFIRMED",
-                    "trackingNumber" to trackingNumber,
-                    "placement" to placement,
-                ),
+                data =
+                    mapOf(
+                        "type" to "DELIVERY_CONFIRMED",
+                        "trackingNumber" to trackingNumber,
+                        "placement" to placement,
+                    ),
             ),
         )
     }
@@ -44,28 +46,31 @@ class NotificationService(
         reason: String,
         willReschedule: Boolean,
     ) {
-        val token = customerFcmToken ?: run {
-            log.debug("No FCM token for customer — skipping delivery failed notification")
-            return
-        }
+        val token =
+            customerFcmToken ?: run {
+                log.debug("No FCM token for customer — skipping delivery failed notification")
+                return
+            }
 
-        val body = if (willReschedule) {
-            "Delivery of $trackingNumber was unsuccessful ($reason). We will try again."
-        } else {
-            "Delivery of $trackingNumber was unsuccessful ($reason). Please contact support."
-        }
+        val body =
+            if (willReschedule) {
+                "Delivery of $trackingNumber was unsuccessful ($reason). We will try again."
+            } else {
+                "Delivery of $trackingNumber was unsuccessful ($reason). Please contact support."
+            }
 
         send(
             PushNotification(
                 recipientFcmToken = token,
                 title = "Delivery attempt unsuccessful",
                 body = body,
-                data = mapOf(
-                    "type" to "DELIVERY_FAILED",
-                    "trackingNumber" to trackingNumber,
-                    "reason" to reason,
-                    "willReschedule" to willReschedule.toString(),
-                ),
+                data =
+                    mapOf(
+                        "type" to "DELIVERY_FAILED",
+                        "trackingNumber" to trackingNumber,
+                        "reason" to reason,
+                        "willReschedule" to willReschedule.toString(),
+                    ),
             ),
         )
     }
@@ -77,21 +82,23 @@ class NotificationService(
         totalStops: Int,
         scheduledDate: String,
     ) {
-        val token = courierFcmToken ?: run {
-            log.debug("No FCM token for courier — skipping shift started notification")
-            return
-        }
+        val token =
+            courierFcmToken ?: run {
+                log.debug("No FCM token for courier — skipping shift started notification")
+                return
+            }
 
         send(
             PushNotification(
                 recipientFcmToken = token,
                 title = "Shift started",
                 body = "Your shift for $scheduledDate has $totalStops stops.",
-                data = mapOf(
-                    "type" to "SHIFT_STARTED",
-                    "totalStops" to totalStops.toString(),
-                    "scheduledDate" to scheduledDate,
-                ),
+                data =
+                    mapOf(
+                        "type" to "SHIFT_STARTED",
+                        "totalStops" to totalStops.toString(),
+                        "scheduledDate" to scheduledDate,
+                    ),
             ),
         )
     }
@@ -101,21 +108,23 @@ class NotificationService(
         totalStops: Int,
         reason: String,
     ) {
-        val token = courierFcmToken ?: run {
-            log.debug("No FCM token for courier — skipping route updated notification")
-            return
-        }
+        val token =
+            courierFcmToken ?: run {
+                log.debug("No FCM token for courier — skipping route updated notification")
+                return
+            }
 
         send(
             PushNotification(
                 recipientFcmToken = token,
                 title = "Route updated",
                 body = "Your route has been updated — $totalStops stops total.",
-                data = mapOf(
-                    "type" to "ROUTE_UPDATED",
-                    "totalStops" to totalStops.toString(),
-                    "reason" to reason,
-                ),
+                data =
+                    mapOf(
+                        "type" to "ROUTE_UPDATED",
+                        "totalStops" to totalStops.toString(),
+                        "reason" to reason,
+                    ),
             ),
         )
     }
@@ -125,21 +134,23 @@ class NotificationService(
         completedStops: Int,
         failedStops: Int,
     ) {
-        val token = courierFcmToken ?: run {
-            log.debug("No FCM token for courier — skipping shift completed notification")
-            return
-        }
+        val token =
+            courierFcmToken ?: run {
+                log.debug("No FCM token for courier — skipping shift completed notification")
+                return
+            }
 
         send(
             PushNotification(
                 recipientFcmToken = token,
                 title = "Shift complete 🎉",
                 body = "Great work! $completedStops delivered, $failedStops failed.",
-                data = mapOf(
-                    "type" to "SHIFT_COMPLETED",
-                    "completedStops" to completedStops.toString(),
-                    "failedStops" to failedStops.toString(),
-                ),
+                data =
+                    mapOf(
+                        "type" to "SHIFT_COMPLETED",
+                        "completedStops" to completedStops.toString(),
+                        "failedStops" to failedStops.toString(),
+                    ),
             ),
         )
     }
