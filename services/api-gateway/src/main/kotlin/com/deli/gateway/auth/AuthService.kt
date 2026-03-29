@@ -137,7 +137,7 @@ class AuthService(
                 userRepository.save(
                     GatewayUser(
                         email = request.email,
-                        passwordHash = passwordEncoder.encode(request.password),
+                        passwordHash = passwordEncoder.encode(request.password)!!,
                         role = UserRole.COURIER.name,
                         firstName = request.firstName,
                         lastName = request.lastName,
@@ -161,7 +161,7 @@ class AuthService(
                 userRepository.save(
                     GatewayUser(
                         email = request.email,
-                        passwordHash = passwordEncoder.encode(request.password),
+                        passwordHash = passwordEncoder.encode(request.password)!!,
                         role = UserRole.CUSTOMER.name,
                         firstName = request.firstName,
                         lastName = request.lastName,
