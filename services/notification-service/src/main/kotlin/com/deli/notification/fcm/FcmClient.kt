@@ -55,16 +55,18 @@ class FcmClient(
 
         return try {
             val payload = buildPayload(notification)
-            val headers = HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-                set("Authorization", "key=$serverKey")
-            }
+            val headers =
+                HttpHeaders().apply {
+                    contentType = MediaType.APPLICATION_JSON
+                    set("Authorization", "key=$serverKey")
+                }
 
-            val response = restTemplate.postForObject(
-                fcmUrl,
-                HttpEntity(payload, headers),
-                Map::class.java,
-            )
+            val response =
+                restTemplate.postForObject(
+                    fcmUrl,
+                    HttpEntity(payload, headers),
+                    Map::class.java,
+                )
 
             val messageId = response?.get("message_id")?.toString()
             if (messageId != null) {
@@ -87,11 +89,12 @@ class FcmClient(
     private fun buildPayload(notification: PushNotification): Map<String, Any> =
         mapOf(
             "to" to notification.recipientFcmToken,
-            "notification" to mapOf(
-                "title" to notification.title,
-                "body" to notification.body,
-                "sound" to "default",
-            ),
+            "notification" to
+                mapOf(
+                    "title" to notification.title,
+                    "body" to notification.body,
+                    "sound" to "default",
+                ),
             "data" to notification.data,
             "priority" to "high",
             "content_available" to true,
