@@ -11,12 +11,39 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus,metrics
+        include: health,info,prometheus
   endpoint:
     health:
       probes:
         enabled: true
-      show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: redis_local
+
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: notification-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
+
+deli:
+  fcm:
+    dry-run: true
+    server-key: ""
+    project-id: deli-local
 
 logging:
   level:
@@ -27,33 +54,26 @@ logging:
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: kubernetes
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: notification-service
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "com.deli.shared.domain.events"
-        # Allow the consumer to process messages concurrently across topic partitions
-        max.poll.records: 50
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     listener:
-      concurrency: 2
-      ack-mode: manual              # Explicit ack — don't lose notifications on crash
+      ack-mode: record
 
 deli:
-  jwt:
-    secret: "local-dev-secret-change-in-production-must-be-at-least-256-bits-long"
   fcm:
-    # Local: set GOOGLE_APPLICATION_CREDENTIALS env var pointing to
-    # a Firebase service account JSON, or leave blank to stub notifications.
-    credentials-path: ${GOOGLE_APPLICATION_CREDENTIALS:}
-    dry-run: ${FCM_DRY_RUN:true}   # true = log instead of actually sending in local dev
-
-logging:
-  level:
-    root: DEBUG
-    org.springframework.kafka: DEBUG
+    dry-run: ${FCM_DRY_RUN:false}
+    server-key: ${FCM_SERVER_KEY:}
+    project-id: ${FCM_PROJECT_ID:}

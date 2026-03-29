@@ -64,6 +64,11 @@ spring:
           uri: http://localhost:8084
           predicates:
             - Path=/api/notifications/**
+
+        - id: location-service-ws
+          uri: ws://localhost:8083
+          predicates:
+            - Path=/ws/**
       globalcors:
         cors-configurations:
           '[/**]':
