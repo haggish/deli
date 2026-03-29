@@ -13,7 +13,7 @@ subprojects {
         compilerOptions {
             freeCompilerArgs.addAll(
                 "-Xjsr305=strict",           // null-safety for Spring annotations
-                "-Xcontext-receivers",       // context receivers (experimental)
+                "-Xcontext-parameters",      // context parameters (replaces -Xcontext-receivers in Kotlin 2.3+)
             )
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         }
