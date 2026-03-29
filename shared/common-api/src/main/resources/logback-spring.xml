@@ -17,13 +17,15 @@
 -->
 <configuration>
 
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
   <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="deli-service"/>
 
   <!-- ── Local profile: human-readable ──────────────────────────────────── -->
   <springProfile name="local">
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
-        <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%xwEx</pattern>
+        <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx</pattern>
       </encoder>
     </appender>
     <root level="INFO">
