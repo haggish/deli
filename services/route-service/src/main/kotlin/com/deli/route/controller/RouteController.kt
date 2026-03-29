@@ -4,6 +4,7 @@ import com.deli.route.domain.Shift
 import com.deli.route.domain.Stop
 import com.deli.route.service.RouteService
 import com.deli.shared.api.request.AddStopRequest
+import com.deli.shared.api.request.CompleteStopRequest
 import com.deli.shared.api.request.StartShiftRequest
 import com.deli.shared.api.response.AddressResponse
 import com.deli.shared.api.response.ApiResponse
@@ -115,6 +116,15 @@ class RouteController(
         @PathVariable stopId: UUID,
     ): ApiResponse<StopResponse> {
         val stop = routeService.getStop(stopId)
+        return ApiResponse.ok(stop.toResponse())
+    }
+
+    @PatchMapping("/stops/{stopId}/complete")
+    fun completeStop(
+        @PathVariable stopId: UUID,
+        @RequestBody body: CompleteStopRequest,
+    ): ApiResponse<StopResponse> {
+        val stop = routeService.markStopCompleted(stopId, body.deliveryStatus, body.courierNote)
         return ApiResponse.ok(stop.toResponse())
     }
 

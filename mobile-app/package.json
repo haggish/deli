@@ -1,0 +1,51 @@
+{
+  "name": "deli-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deli courier platform mobile app",
+  "scripts": {
+    "start": "ng serve --port 8100",
+    "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "android": "npx cap run android",
+    "android:build": "ng build --configuration production && npx cap sync android",
+    "lint": "ng lint",
+    "test": "ng test --watch=false --browsers=ChromeHeadless"
+  },
+  "dependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/forms": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/geolocation": "^6.0.0",
+    "@capacitor/push-notifications": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@ionic/angular": "^8.0.0",
+    "@ionic/angular-toolkit": "^11.0.0",
+    "ionicons": "^7.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.6.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.0",
+    "@angular/cli": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/compiler-cli": "^19.2.0",
+    "@capacitor/cli": "^6.0.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.3.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.6.0"
+  }
+}

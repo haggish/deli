@@ -1,0 +1,38 @@
+/* Global styles for Deli mobile app */
+
+:root {
+  /* Brand */
+  --deli-yellow: #e8ff00;
+  --deli-purple: #7c6aff;
+  --deli-bg: #0f0f0f;
+  --deli-surface: #1a1a1a;
+  --deli-border: #222;
+  --deli-text: #ffffff;
+  --deli-text-muted: #666;
+
+  /* Ionic overrides */
+  --ion-background-color: var(--deli-bg);
+  --ion-text-color: var(--deli-text);
+  --ion-color-primary: var(--deli-yellow);
+  --ion-color-primary-contrast: #0f0f0f;
+  --ion-toolbar-background: var(--deli-bg);
+  --ion-item-background: var(--deli-surface);
+  --ion-border-color: var(--deli-border);
+  --ion-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Smooth scrolling */
+ion-content {
+  --scroll-bar-color: transparent;
+}
+
+/* Remove default list lines */
+ion-list {
+  --ion-item-border-color: transparent;
+  background: transparent !important;
+}
+
+/* Spinner colour */
+ion-spinner {
+  --color: var(--deli-yellow);
+}

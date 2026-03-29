@@ -1,6 +1,7 @@
 package com.deli.shared.api.request
 
 import com.deli.shared.domain.model.DeliveryPlacement
+import com.deli.shared.domain.model.DeliveryStatus
 import com.deli.shared.domain.model.FailureReason
 import com.deli.shared.domain.model.PackageFlag
 import com.deli.shared.domain.model.VehicleType
@@ -152,6 +153,8 @@ data class AddressRequest(
     val buzzerCode: String? = null,
     @field:Size(max = 500) val deliveryInstructions: String? = null,
 )
+
+data class CompleteStopRequest(val deliveryStatus: DeliveryStatus, val courierNote: String? = null)
 
 // ── Shift management ──────────────────────────────────────────────────────────
 
