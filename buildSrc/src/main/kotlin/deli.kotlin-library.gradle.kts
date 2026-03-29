@@ -13,10 +13,10 @@ kotlin {
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
-    api("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.3.20")
+    api("org.jetbrains.kotlin:kotlin-reflect:2.3.20")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.10.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
