@@ -29,16 +29,19 @@ class NotificationController(
         @RequestHeader("X-User-Role") role: String,
         @RequestBody body: Map<String, String>,
     ): ApiResponse<Nothing?> {
-        val token = body["fcmToken"]
-            ?: return ApiResponse.error(
-                com.deli.shared.api.response.ApiError("MISSING_FIELD", "fcmToken is required"),
-            )
+        val token =
+            body["fcmToken"]
+                ?: return ApiResponse.error(
+                    com.deli.shared.api.response
+                        .ApiError("MISSING_FIELD", "fcmToken is required"),
+                )
 
         when (role.uppercase()) {
             "COURIER" -> tokenRegistry.registerCourierToken(userId, token)
             "CUSTOMER" -> tokenRegistry.registerCustomerToken(userId, token)
             else -> return ApiResponse.error(
-                com.deli.shared.api.response.ApiError("INVALID_ROLE", "Unknown role: $role"),
+                com.deli.shared.api.response
+                    .ApiError("INVALID_ROLE", "Unknown role: $role"),
             )
         }
 

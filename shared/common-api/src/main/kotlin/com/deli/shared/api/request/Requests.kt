@@ -154,7 +154,10 @@ data class AddressRequest(
     @field:Size(max = 500) val deliveryInstructions: String? = null,
 )
 
-data class CompleteStopRequest(val deliveryStatus: DeliveryStatus, val courierNote: String? = null)
+data class CompleteStopRequest(
+    val deliveryStatus: DeliveryStatus,
+    val courierNote: String? = null,
+)
 
 // ── Shift management ──────────────────────────────────────────────────────────
 

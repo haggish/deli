@@ -31,21 +31,25 @@ class FcmTokenRegistry(
         private val TTL = Duration.ofDays(30)
     }
 
-    fun registerCourierToken(courierId: String, fcmToken: String) {
+    fun registerCourierToken(
+        courierId: String,
+        fcmToken: String,
+    ) {
         redis.opsForValue().set("$COURIER_PREFIX$courierId", fcmToken, TTL)
         log.debug("Registered FCM token for courier $courierId")
     }
 
-    fun registerCustomerToken(customerId: String, fcmToken: String) {
+    fun registerCustomerToken(
+        customerId: String,
+        fcmToken: String,
+    ) {
         redis.opsForValue().set("$CUSTOMER_PREFIX$customerId", fcmToken, TTL)
         log.debug("Registered FCM token for customer $customerId")
     }
 
-    fun getCourierToken(courierId: String): String? =
-        redis.opsForValue().get("$COURIER_PREFIX$courierId")
+    fun getCourierToken(courierId: String): String? = redis.opsForValue().get("$COURIER_PREFIX$courierId")
 
-    fun getCustomerToken(customerId: String): String? =
-        redis.opsForValue().get("$CUSTOMER_PREFIX$customerId")
+    fun getCustomerToken(customerId: String): String? = redis.opsForValue().get("$CUSTOMER_PREFIX$customerId")
 
     fun removeCourierToken(courierId: String) {
         redis.delete("$COURIER_PREFIX$courierId")

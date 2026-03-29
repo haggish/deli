@@ -22,7 +22,14 @@ data class PushNotification(
  * Result of a single FCM send attempt.
  */
 sealed class SendResult {
-    data class Success(val messageId: String) : SendResult()
-    data class Failure(val reason: String, val isRetryable: Boolean) : SendResult()
+    data class Success(
+        val messageId: String,
+    ) : SendResult()
+
+    data class Failure(
+        val reason: String,
+        val isRetryable: Boolean,
+    ) : SendResult()
+
     data object DryRun : SendResult()
 }

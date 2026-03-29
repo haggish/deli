@@ -55,18 +55,21 @@ class GatewayAuthFilter : OncePerRequestFilter() {
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(private val gatewayAuthFilter: GatewayAuthFilter) {
-
+class SecurityConfig(
+    private val gatewayAuthFilter: GatewayAuthFilter,
+) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/actuator/**").permitAll()
-                    .anyRequest().authenticated()
-            }
-            .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+                auth
+                    .requestMatchers("/actuator/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 }
 
@@ -79,7 +82,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ResponseEntity<ApiResponse<Nothing>> {
         log.error("Unhandled exception", ex)
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiResponse.error(ApiError("INTERNAL_ERROR", "An unexpected error occurred")))
     }
 }
@@ -88,7 +92,6 @@ class GlobalExceptionHandler {
 
 @Configuration
 class JacksonConfig {
-
     @Bean
     fun objectMapper(): ObjectMapper =
         ObjectMapper().apply {

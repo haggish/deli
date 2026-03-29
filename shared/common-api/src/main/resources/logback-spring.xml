@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  logback-spring.xml — Structured JSON logging for production.
+
+  In local profile: coloured human-readable output.
+  In kubernetes profile: JSON lines for log aggregation (Loki, Datadog, etc.)
+
+  Each log line includes:
+    - timestamp (ISO-8601)
+    - level
+    - service name
+    - traceId / spanId (populated by Spring Boot's micrometer tracing)
+    - userId (set via MDC in GatewayAuthFilter)
+    - logger name
+    - message
+    - exception (if present)
+-->
+<configuration>
+
+  <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="deli-service"/>
+
+  <!-- ── Local profile: human-readable ──────────────────────────────────── -->
+  <springProfile name="local">
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%xwEx</pattern>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+    <logger name="com.deli" level="DEBUG"/>
+    <logger name="io.r2dbc" level="WARN"/>
+    <logger name="org.springframework.r2dbc" level="WARN"/>
+  </springProfile>
+
+  <!-- ── Kubernetes profile: JSON lines ────────────────────────────────── -->
+  <springProfile name="kubernetes">
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <includeMdcKeyName>traceId</includeMdcKeyName>
+        <includeMdcKeyName>spanId</includeMdcKeyName>
+        <includeMdcKeyName>userId</includeMdcKeyName>
+        <includeMdcKeyName>userRole</includeMdcKeyName>
+        <customFields>{"service":"${SERVICE_NAME}"}</customFields>
+        <fieldNames>
+          <timestamp>timestamp</timestamp>
+          <message>message</message>
+          <logger>logger</logger>
+          <thread>thread</thread>
+          <level>level</level>
+          <levelValue>[ignore]</levelValue>
+        </fieldNames>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="JSON_CONSOLE"/>
+    </root>
+  </springProfile>
+
+</configuration>

@@ -1,7 +1,7 @@
 package com.deli.notification.consumer
 
-import com.deli.notification.service.NotificationService
 import com.deli.notification.service.FcmTokenRegistry
+import com.deli.notification.service.NotificationService
 import com.deli.shared.domain.events.DeliveryConfirmedEvent
 import com.deli.shared.domain.events.DeliveryFailedEvent
 import com.deli.shared.domain.events.EventEnvelope
@@ -24,10 +24,11 @@ class NotificationConsumers(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-    }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
 
     // ── delivery.confirmed ────────────────────────────────────────────────────
 
@@ -48,8 +49,11 @@ class NotificationConsumers(
             notificationService.notifyDeliveryConfirmed(
                 customerFcmToken = customerToken,
                 trackingNumber = event.trackingNumber.value,
-                placement = event.placement.name.replace('_', ' ').lowercase()
-                    .replaceFirstChar { it.uppercase() },
+                placement =
+                    event.placement.name
+                        .replace('_', ' ')
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() },
             )
         }.onFailure {
             log.error("Failed to process DeliveryConfirmed at offset $offset", it)
@@ -75,8 +79,11 @@ class NotificationConsumers(
             notificationService.notifyDeliveryFailed(
                 customerFcmToken = customerToken,
                 trackingNumber = event.trackingNumber.value,
-                reason = event.reason.name.replace('_', ' ').lowercase()
-                    .replaceFirstChar { it.uppercase() },
+                reason =
+                    event.reason.name
+                        .replace('_', ' ')
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() },
                 willReschedule = event.willReschedule,
             )
         }.onFailure {
@@ -129,8 +136,11 @@ class NotificationConsumers(
             notificationService.notifyRouteUpdated(
                 courierFcmToken = courierToken,
                 totalStops = event.totalStops,
-                reason = event.changeReason.name.replace('_', ' ').lowercase()
-                    .replaceFirstChar { it.uppercase() },
+                reason =
+                    event.changeReason.name
+                        .replace('_', ' ')
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() },
             )
         }.onFailure {
             log.error("Failed to process RouteUpdated at offset $offset", it)
