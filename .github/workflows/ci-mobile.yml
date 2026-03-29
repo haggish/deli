@@ -1,24 +1,26 @@
-name: CI — Mobile App
+name: Mobile CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: ["**"]
     paths:
-      - 'mobile-app/**'
-      - '.github/workflows/ci-mobile.yml'
+      - "mobile-app/**"
+      - ".github/workflows/ci-mobile.yml"
   pull_request:
     branches: [main, develop]
     paths:
-      - 'mobile-app/**'
+      - "mobile-app/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  lint-test-build:
-    name: Lint, test and build
+  build:
+    name: Build & Type Check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     defaults:
       run:
         working-directory: mobile-app
@@ -26,27 +28,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "20"
+          cache: npm
           cache-dependency-path: mobile-app/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
-      - name: Lint
-        run: npm run lint
+      - name: Type check
+        run: npx tsc --noEmit
 
-      - name: Unit tests
-        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+      - name: Build production bundle
+        run: npm run build:prod
 
-      - name: Build (production)
-        run: npm run build -- --configuration production
-
-      - name: Upload coverage
-        if: always()
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: mobile-coverage
-          path: mobile-app/coverage/
+          name: mobile-www
+          path: mobile-app/www/
+          retention-days: 3

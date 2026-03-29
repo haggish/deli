@@ -1,231 +1,105 @@
-name: CI — Backend
+name: Backend CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: ["**"]
     paths:
-      - 'services/**'
-      - 'shared/**'
-      - 'buildSrc/**'
-      - 'gradle/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - '.github/workflows/ci-backend.yml'
+      - "services/**"
+      - "shared/**"
+      - "buildSrc/**"
+      - "gradle/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - ".github/workflows/ci-backend.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - 'services/**'
-      - 'shared/**'
-      - 'buildSrc/**'
-      - 'gradle/**'
 
-# Cancel in-progress runs on the same branch when a new commit is pushed
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  JAVA_VERSION: '21'
-  GRADLE_OPTS: '-Xmx2g -Dfile.encoding=UTF-8'
+  JAVA_VERSION: "21"
 
 jobs:
-  # ── Determine which subprojects were actually affected ────────────────────
-  affected:
-    name: Detect affected projects
+  test:
+    name: Build & Test
     runs-on: ubuntu-latest
-    outputs:
-      shared:               ${{ steps.changes.outputs.shared }}
-      api-gateway:          ${{ steps.changes.outputs.api-gateway }}
-      route-service:        ${{ steps.changes.outputs.route-service }}
-      delivery-service:     ${{ steps.changes.outputs.delivery-service }}
-      location-service:     ${{ steps.changes.outputs.location-service }}
-      notification-service: ${{ steps.changes.outputs.notification-service }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0              # full history needed for path comparison
+    timeout-minutes: 20
 
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            shared:
-              - 'shared/**'
-              - 'buildSrc/**'
-              - 'gradle/**'
-            api-gateway:
-              - 'services/api-gateway/**'
-              - 'shared/**'
-            route-service:
-              - 'services/route-service/**'
-              - 'shared/**'
-            delivery-service:
-              - 'services/delivery-service/**'
-              - 'shared/**'
-            location-service:
-              - 'services/location-service/**'
-              - 'shared/**'
-            notification-service:
-              - 'services/notification-service/**'
-              - 'shared/**'
-
-  # ── Shared library build (always runs when shared/ changes) ───────────────
-  build-shared:
-    name: Build shared libraries
-    needs: affected
-    if: needs.affected.outputs.shared == 'true'
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
+          cache: gradle
 
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: gradle-${{ runner.os }}-
 
-      - name: Build and test shared libraries
-        run: ./gradlew :shared:domain-model:build :shared:common-api:build --stacktrace
+      - name: Build shared modules
+        run: ./gradlew :shared:domain-model:build :shared:common-api:build --no-configuration-cache
+
+      - name: Run shared module tests
+        run: ./gradlew :shared:domain-model:test --no-configuration-cache
+
+      - name: Build all services
+        run: ./gradlew build --no-configuration-cache -x test
+
+      - name: Run all tests
+        run: ./gradlew test --no-configuration-cache
 
       - name: Upload test reports
-        if: failure()
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: shared-test-reports
-          path: shared/**/build/reports/tests/
+          name: test-reports
+          path: "**/build/reports/tests/"
+          retention-days: 7
 
-  # ── Per-service build matrix ───────────────────────────────────────────────
-  build-service:
-    name: Build ${{ matrix.service }}
-    needs: affected
+  lint:
+    name: Lint (ktlint)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false              # Don't cancel other services if one fails
-      matrix:
-        include:
-          - service: api-gateway
-            affected: ${{ needs.affected.outputs.api-gateway }}
-          - service: route-service
-            affected: ${{ needs.affected.outputs.route-service }}
-          - service: delivery-service
-            affected: ${{ needs.affected.outputs.delivery-service }}
-          - service: location-service
-            affected: ${{ needs.affected.outputs.location-service }}
-          - service: notification-service
-            affected: ${{ needs.affected.outputs.notification-service }}
-
-    # Only run this job if this specific service was affected
-    if: matrix.affected == 'true'
-
-    services:
-      # Services that need Testcontainers use Docker — but we start real containers
-      # only for services that need them. Testcontainers manages its own lifecycle.
-      postgres:
-        image: postgres:16.2-alpine
-        env:
-          POSTGRES_DB: courierdb_test
-          POSTGRES_USER: courier_user
-          POSTGRES_PASSWORD: courier_pass_local
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
+          cache: gradle
 
-      - uses: gradle/actions/setup-gradle@v4
+      - name: Cache Gradle
+        uses: actions/cache@v4
         with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: gradle-${{ runner.os }}-
 
-      - name: Build, test and check ${{ matrix.service }}
-        run: |
-          ./gradlew \
-            :services:${{ matrix.service }}:build \
-            :services:${{ matrix.service }}:detekt \
-            --stacktrace
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/courierdb_test
-          SPRING_DATASOURCE_USERNAME: courier_user
-          SPRING_DATASOURCE_PASSWORD: courier_pass_local
+      - name: Run ktlint
+        run: ./gradlew ktlintCheck --no-configuration-cache
 
-      - name: Upload test reports on failure
-        if: failure()
+      - name: Upload ktlint reports
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: ${{ matrix.service }}-test-reports
-          path: services/${{ matrix.service }}/build/reports/
-
-  # ── Docker image build (main branch only) ─────────────────────────────────
-  docker-build:
-    name: Docker — ${{ matrix.service }}
-    needs: build-service
-    if: github.ref == 'refs/heads/main' && needs.build-service.result == 'success'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          - api-gateway
-          - route-service
-          - delivery-service
-          - location-service
-          - notification-service
-
-    permissions:
-      contents: read
-      packages: write               # needed to push to ghcr.io
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: temurin
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Build fat JAR
-        run: ./gradlew :services:${{ matrix.service }}:bootJar --stacktrace
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/deli-${{ matrix.service }}
-          tags: |
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: services/${{ matrix.service }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64      # Android devices are amd64 in emulation
+          name: ktlint-reports
+          path: "**/build/reports/ktlint/"
+          retention-days: 7

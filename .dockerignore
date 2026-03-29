@@ -1,0 +1,26 @@
+# Gradle build outputs
+build/
+.gradle/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Test reports
+**/build/reports/
+
+# Node (mobile app)
+mobile-app/node_modules/
+mobile-app/www/
+mobile-app/.angular/
