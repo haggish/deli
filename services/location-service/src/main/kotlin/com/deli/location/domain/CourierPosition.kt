@@ -15,7 +15,7 @@ import java.time.Instant
  */
 data class CourierPosition(
     val courierId: String,
-    val shiftId: String,
+    val shiftId: String?,
     val latitude: Double,
     val longitude: Double,
     val speedKmh: Double?,
