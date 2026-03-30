@@ -10,5 +10,5 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-gradle-plugin:4.0.5")
     implementation("io.spring.gradle:dependency-management-plugin:1.1.7")
     //implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.8")
-    implementation("org.jlleitschuh.gradle:ktlint-gradle:12.1.2")
+    implementation("org.jlleitschuh.gradle:ktlint-gradle:14.0.1")
 }

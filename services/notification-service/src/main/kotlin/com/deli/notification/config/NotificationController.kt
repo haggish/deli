@@ -38,7 +38,9 @@ class NotificationController(
 
         when (role.uppercase()) {
             "COURIER" -> tokenRegistry.registerCourierToken(userId, token)
+
             "CUSTOMER" -> tokenRegistry.registerCustomerToken(userId, token)
+
             else -> return ApiResponse.error(
                 com.deli.shared.api.response
                     .ApiError("INVALID_ROLE", "Unknown role: $role"),

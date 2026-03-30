@@ -1,48 +1,38 @@
 root = true
 
-# ── All files ─────────────────────────────────────────────────────────────────
 [*]
-charset                  = utf-8
-end_of_line              = lf          # LF everywhere — critical for WSL/Windows interop
-indent_style             = space
-insert_final_newline     = true
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
 trim_trailing_whitespace = true
 
-# ── Kotlin ────────────────────────────────────────────────────────────────────
 [*.{kt,kts}]
-indent_size              = 4
-max_line_length          = 120
-ij_kotlin_imports_layout = *,java.**,javax.**,kotlin.**,^
-
-# ── YAML (Kubernetes / Helm / Spring application.yml) ─────────────────────────
+ktlint_code_style = ktlint_official
+max_line_length = 120
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_kotlin_name_count_to_use_star_import = 999
+ij_kotlin_name_count_to_use_star_import_for_members = 999
+ij_kotlin_packages_to_use_import_on_demand =
 [*.{yml,yaml}]
-indent_size              = 2
+indent_size = 2
 
-# ── JSON ──────────────────────────────────────────────────────────────────────
 [*.json]
-indent_size              = 2
+indent_size = 2
 
-# ── Gradle ────────────────────────────────────────────────────────────────────
 [*.gradle.kts]
-indent_size              = 4
+indent_size = 4
 
-# ── Markdown ──────────────────────────────────────────────────────────────────
 [*.md]
-trim_trailing_whitespace = false        # Trailing spaces are significant in Markdown
+trim_trailing_whitespace = false
 
-# ── Shell scripts ─────────────────────────────────────────────────────────────
 [*.sh]
-indent_size              = 2
-end_of_line              = lf
+indent_size = 2
+end_of_line = lf
 
-# ── Dockerfiles ───────────────────────────────────────────────────────────────
 [Dockerfile*]
-indent_size              = 4
+indent_size = 4
 
-# ── Helm / Kubernetes templates ───────────────────────────────────────────────
-[*.{yaml,yml}]
-indent_size              = 2
-
-# ── TypeScript / Angular (mobile-app) ────────────────────────────────────────
 [mobile-app/**/*.{ts,html,scss,css}]
-indent_size              = 2
+indent_size = 2

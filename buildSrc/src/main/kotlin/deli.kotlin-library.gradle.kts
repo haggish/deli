@@ -28,6 +28,6 @@ tasks.test {
 }
 
 ktlint {
-    version.set("1.4.1")
+    version.set("1.8.0")
     android.set(false)
 }

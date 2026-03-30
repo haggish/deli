@@ -27,20 +27,25 @@ class GlobalExceptionHandler(
     ): Mono<Void> {
         val (status, error) =
             when (ex) {
-                is AuthException.InvalidCredentials ->
+                is AuthException.InvalidCredentials -> {
                     HttpStatus.UNAUTHORIZED to ApiError("INVALID_CREDENTIALS", ex.message ?: "Invalid credentials")
+                }
 
-                is AuthException.InvalidToken ->
+                is AuthException.InvalidToken -> {
                     HttpStatus.UNAUTHORIZED to ApiError("INVALID_TOKEN", ex.message ?: "Invalid token")
+                }
 
-                is AuthException.TokenExpired ->
+                is AuthException.TokenExpired -> {
                     HttpStatus.UNAUTHORIZED to ApiError("TOKEN_EXPIRED", "Token has expired")
+                }
 
-                is AuthException.EmailAlreadyExists ->
+                is AuthException.EmailAlreadyExists -> {
                     HttpStatus.CONFLICT to ApiError("EMAIL_EXISTS", ex.message ?: "Email already registered")
+                }
 
-                is AuthException.AccountDisabled ->
+                is AuthException.AccountDisabled -> {
                     HttpStatus.FORBIDDEN to ApiError("ACCOUNT_DISABLED", ex.message ?: "Account disabled")
+                }
 
                 is WebExchangeBindException -> {
                     val details =

@@ -63,7 +63,7 @@ Deli is a courier delivery platform. Couriers manage daily delivery shifts via m
 - `shared/domain-model` — Kafka event types, domain models, value objects
 - `shared/common-api` — HTTP request/response DTOs, `MdcLoggingFilter`
 
-**Gradle convention plugins** in `buildSrc/` apply uniformly: Java 21 toolchain, ktlint 1.4.1, Kotest + Mockk + TestContainers for tests, Prometheus metrics. Detekt is present but disabled pending 2.0 stable.
+**Gradle convention plugins** in `buildSrc/` apply uniformly: Java 21 toolchain, ktlint 1.8.0, Kotest + Mockk + TestContainers for tests, Prometheus metrics. Detekt is present but disabled pending 2.0 stable.
 
 **Mobile app** (`mobile-app/`) is Ionic 8 / Angular 19 / Capacitor 6. Feature folders: `auth/`, `courier/`, `customer/`. Shared services in `app/shared/services/`.
 

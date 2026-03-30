@@ -159,10 +159,14 @@ class NotificationService(
 
     private fun send(notification: PushNotification) {
         when (val result = fcmClient.send(notification)) {
-            is SendResult.Success ->
+            is SendResult.Success -> {
                 log.info("Notification sent: messageId=${result.messageId}")
-            is SendResult.DryRun ->
+            }
+
+            is SendResult.DryRun -> {
                 log.info("Notification logged (dry run): title='${notification.title}'")
+            }
+
             is SendResult.Failure -> {
                 log.warn("Notification failed: ${result.reason} (retryable=${result.isRetryable})")
                 // In production: push to a dead-letter queue for retry
