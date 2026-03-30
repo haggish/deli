@@ -12,5 +12,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.10.0")
 
     // Jakarta Validation annotations referenced in exception messages
-    compileOnly("jakarta.validation:jakarta.validation-api:3.1.0")
+    compileOnly("jakarta.validation:jakarta.validation-api:3.1.1")
 }
