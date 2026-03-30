@@ -60,7 +60,7 @@ jobs:
         run: ./gradlew test --no-configuration-cache
 
       - name: Upload test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: test-reports
@@ -95,7 +95,7 @@ jobs:
         run: ./gradlew ktlintCheck --no-configuration-cache
 
       - name: Upload ktlint reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: ktlint-reports
