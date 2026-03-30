@@ -28,8 +28,8 @@ dependencies {
     implementation(project(":shared:common-api"))
 
     // Testing
-    testImplementation("org.testcontainers:postgresql:1.20.4")
-    testImplementation("org.testcontainers:r2dbc:1.20.4")
+    testImplementation("org.testcontainers:postgresql:1.21.4")
+    testImplementation("org.testcontainers:r2dbc:1.21.4")
     testImplementation("io.projectreactor:reactor-test")
 }
 
