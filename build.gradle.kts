@@ -11,6 +11,7 @@ subprojects {
     // Kotlin compiler options applied uniformly
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         compilerOptions {
+            javaParameters.set(true)         // embed parameter names in bytecode — required for Jackson 3.x ConstructorDetector
             freeCompilerArgs.addAll(
                 "-Xjsr305=strict",           // null-safety for Spring annotations
                 "-Xcontext-parameters",      // context parameters (replaces -Xcontext-receivers in Kotlin 2.3+)

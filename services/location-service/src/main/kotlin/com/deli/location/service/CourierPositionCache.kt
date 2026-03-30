@@ -1,11 +1,11 @@
 package com.deli.location.service
 
 import com.deli.location.domain.CourierPosition
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
+import tools.jackson.databind.ObjectMapper
 import java.time.Duration
 
 @Service

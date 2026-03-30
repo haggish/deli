@@ -2,11 +2,6 @@ package com.deli.notification.config
 
 import com.deli.shared.api.response.ApiError
 import com.deli.shared.api.response.ApiResponse
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.kotlinModule
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -86,18 +81,4 @@ class GlobalExceptionHandler {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiResponse.error(ApiError("INTERNAL_ERROR", "An unexpected error occurred")))
     }
-}
-
-// ── Jackson config ────────────────────────────────────────────────────────────
-
-@Configuration
-class JacksonConfig {
-    @Bean
-    fun objectMapper(): ObjectMapper =
-        ObjectMapper().apply {
-            registerModule(kotlinModule())
-            registerModule(JavaTimeModule())
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        }
 }

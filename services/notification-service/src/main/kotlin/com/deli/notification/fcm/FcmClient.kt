@@ -2,7 +2,6 @@ package com.deli.notification.fcm
 
 import com.deli.notification.domain.PushNotification
 import com.deli.notification.domain.SendResult
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -11,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import tools.jackson.databind.ObjectMapper
 
 /**
  * Firebase Cloud Messaging client using the FCM HTTP v1 API.

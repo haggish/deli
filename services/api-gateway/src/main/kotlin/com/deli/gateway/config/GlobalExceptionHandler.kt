@@ -3,7 +3,6 @@ package com.deli.gateway.config
 import com.deli.gateway.auth.AuthException
 import com.deli.shared.api.response.ApiError
 import com.deli.shared.api.response.ApiResponse
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -13,6 +12,7 @@ import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebExceptionHandler
 import reactor.core.publisher.Mono
+import tools.jackson.databind.ObjectMapper
 
 @Component
 @Order(-2)

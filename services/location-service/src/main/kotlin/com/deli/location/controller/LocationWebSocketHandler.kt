@@ -2,13 +2,13 @@ package com.deli.location.controller
 
 import com.deli.location.service.LocationService
 import com.deli.shared.api.request.LocationPingRequest
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
+import tools.jackson.databind.ObjectMapper
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
