@@ -17,7 +17,7 @@ dependencies {
     // Flyway — uses JDBC only for schema migrations, R2DBC for runtime queries
     implementation("org.flywaydb:flyway-core:10.22.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
-    runtimeOnly("org.postgresql:postgresql:42.7.4")
+    runtimeOnly("org.postgresql:postgresql:42.7.10")
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
