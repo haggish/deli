@@ -52,3 +52,20 @@ logs/
 # ── Test outputs ─────────────────────────────────────────────────────────────
 **/test-results/
 **/reports/
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform.tfstate.*.backup
+**/terraform.tfvars
+**/terraform.tfvars.json
+**/*.auto.tfvars
+**/*.auto.tfvars.json
+**/crash.log
+**/crash.*.log
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
