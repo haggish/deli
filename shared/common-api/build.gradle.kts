@@ -10,5 +10,5 @@ dependencies {
     implementation("org.springframework:spring-web:7.0.6")
     implementation("org.springframework:spring-context:7.0.6")
     implementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
-    implementation("org.slf4j:slf4j-api:2.0.13")
+    implementation("org.slf4j:slf4j-api:2.0.17")
 }
