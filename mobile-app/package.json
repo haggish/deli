@@ -43,7 +43,7 @@
     "@angular/compiler-cli": "^21.2.6",
     "@capacitor/cli": "^8.3.0",
     "jsdom": "^29.0.1",
-    "typescript": "~5.9.0",
+    "typescript": "~6.0.2",
     "vitest": "^4.1.2"
   }
 }
