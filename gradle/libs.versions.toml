@@ -10,7 +10,7 @@ kotlinx-serialization   = "1.10.0"
 flyway                  = "10.22.0"
 postgresql              = "42.7.10"
 timescaledb             = "42.7.4"        # same JDBC driver, different schema
-hikari                  = "6.2.1"
+hikari                  = "7.0.2"
 
 # Kafka
 kafka                   = "3.9.0"
