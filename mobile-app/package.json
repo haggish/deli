@@ -44,6 +44,6 @@
     "@capacitor/cli": "^8.3.0",
     "jsdom": "^29.0.2",
     "typescript": "~5.9.0",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   }
 }
