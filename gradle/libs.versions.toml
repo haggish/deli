@@ -20,7 +20,7 @@ spring-kafka            = "4.0.4"
 jjwt                    = "0.12.6"
 
 # Observability
-micrometer              = "1.14.2"
+micrometer              = "1.16.4"
 opentelemetry           = "1.45.0"
 
 # Testing
