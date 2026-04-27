@@ -1,6 +1,6 @@
 [versions]
 kotlin                  = "2.3.20"
-spring-boot             = "4.0.5"
+spring-boot             = "4.0.6"
 spring-dependency-mgmt  = "1.1.7"
 spring-cloud            = "2025.0.1"
 kotlinx-coroutines      = "1.10.2"
@@ -14,7 +14,7 @@ hikari                  = "7.0.2"
 
 # Kafka
 kafka                   = "3.9.0"
-spring-kafka            = "4.0.4"
+spring-kafka            = "4.0.5"
 
 # JWT
 jjwt                    = "0.12.6"
