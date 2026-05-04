@@ -32,7 +32,7 @@ archunit                = "1.4.1"
 # Build tooling
 detekt                  = "1.23.8"
 ktlint-gradle           = "14.2.0"
-openapi-generator       = "7.21.0"
+openapi-generator       = "7.22.0"
 
 [libraries]
 # ── Kotlin stdlib & coroutines ────────────────────────────────────────────────
