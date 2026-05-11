@@ -11,7 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
 
-    runtimeOnly("org.postgresql:postgresql:42.7.10")
+    runtimeOnly("org.postgresql:postgresql:42.7.11")
 
     implementation("org.flywaydb:flyway-core:10.22.0")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
