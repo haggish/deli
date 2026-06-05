@@ -17,7 +17,7 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
 
     // AWS SDK v2 for MinIO S3 pre-signed URLs
-    implementation(platform("software.amazon.awssdk:bom:2.44.0"))
+    implementation(platform("software.amazon.awssdk:bom:2.44.4"))
     implementation("software.amazon.awssdk:s3")
 
     implementation(project(":shared:common-api"))
