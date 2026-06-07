@@ -29,22 +29,22 @@ route      delivery   location  notification
 
 | Layer | Technology |
 |---|---|
-| Mobile | Ionic 8 / Angular 19 / Capacitor 6 |
-| Gateway | Spring Cloud Gateway 4 / Spring Boot 3.4 |
-| Services | Kotlin 2.1 / Spring Boot 3.4 |
-| Messaging | Apache Kafka 3.7 (KRaft) |
+| Mobile | Ionic 8 / Angular 21 / Capacitor 8 |
+| Gateway | Spring Cloud Gateway / Spring Boot 4.0 |
+| Services | Kotlin 2.3 / Spring Boot 4.0 |
+| Messaging | Apache Kafka 3.9 (KRaft) |
 | Primary DB | PostgreSQL 16 |
 | Time-series | TimescaleDB 2.14 |
 | Cache | Redis 7.4 |
 | Object store | MinIO |
-| Build | Gradle 8.8 (Kotlin DSL) |
+| Build | Gradle 9.4 (Kotlin DSL) |
 | Deploy | Kubernetes / Helm |
 
 ## Prerequisites
 
 - WSL 2 with project in native filesystem (`~/projects/deli`)
 - Java 21 (Eclipse Temurin)
-- Node.js 20+
+- Node.js 22+
 - Docker Desktop with Kubernetes enabled
 - Helm 3.x
 

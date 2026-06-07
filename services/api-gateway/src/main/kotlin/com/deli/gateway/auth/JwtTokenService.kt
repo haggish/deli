@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.security.MessageDigest
 import java.time.Instant
 import java.util.Date
 import javax.crypto.SecretKey
@@ -21,13 +22,10 @@ class JwtTokenService(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    // Derive a 256-bit HMAC-SHA key from the configured secret string
+    // Derive a 256-bit HMAC-SHA key by hashing the configured secret with SHA-256
     private val signingKey: SecretKey =
         Keys.hmacShaKeyFor(
-            secret.toByteArray(Charsets.UTF_8).let { bytes ->
-                // Pad or truncate to exactly 32 bytes (256 bits) for HS256
-                ByteArray(32) { i -> bytes.getOrElse(i) { 0 } }
-            },
+            MessageDigest.getInstance("SHA-256").digest(secret.toByteArray(Charsets.UTF_8)),
         )
 
     // ── Token issuance ────────────────────────────────────────────────────────

@@ -3,6 +3,8 @@ package com.deli.delivery.config
 import com.deli.shared.api.response.ApiError
 import com.deli.shared.api.response.ApiResponse
 import com.deli.shared.domain.model.DeliException
+import com.deli.shared.domain.model.ForbiddenException
+import com.deli.shared.domain.model.InvalidImageException
 import com.deli.shared.domain.model.StopAlreadyCompletedException
 import com.deli.shared.domain.model.StopNotFoundException
 import org.slf4j.LoggerFactory
@@ -15,6 +17,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleForbidden(ex: ForbiddenException): ResponseEntity<ApiResponse<Nothing>> =
+        ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(ApiResponse.error(ApiError("FORBIDDEN", ex.message ?: "Access denied")))
+
+    @ExceptionHandler(InvalidImageException::class)
+    fun handleInvalidImage(ex: InvalidImageException): ResponseEntity<ApiResponse<Nothing>> =
+        ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.error(ApiError("INVALID_IMAGE", ex.message ?: "Invalid image file")))
 
     @ExceptionHandler(DeliException::class)
     fun handleDomainException(ex: DeliException): ResponseEntity<ApiResponse<Nothing>> {

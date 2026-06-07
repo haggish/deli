@@ -66,6 +66,16 @@ class DuplicateTrackingNumberException(
     tracking: TrackingNumber,
 ) : DeliException("Tracking number already exists: $tracking")
 
+// ── Authorization exceptions ──────────────────────────────────────────────────
+
+class ForbiddenException(
+    message: String = "Access denied",
+) : DeliException(message)
+
+class InvalidImageException(
+    message: String,
+) : DeliException(message)
+
 // ── Infrastructure exceptions ─────────────────────────────────────────────────
 
 class FileUploadException(

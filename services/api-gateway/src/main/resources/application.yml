@@ -83,7 +83,7 @@ spring:
 
 deli:
   jwt:
-    secret: "local-dev-secret-change-in-production-must-be-at-least-256-bits-long"
+    secret: "${JWT_SECRET:local-dev-only-secret-not-for-production!!}"
     expiry-minutes: 60
     refresh-expiry-days: 30
 

@@ -61,8 +61,8 @@ spring:
 deli:
   s3:
     endpoint: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
+    access-key: "${MINIO_ACCESS_KEY:minioadmin}"
+    secret-key: "${MINIO_SECRET_KEY:minioadmin}"
     bucket-photos: delivery-proof-photos
     bucket-signatures: delivery-signatures
     presigned-url-expiry-seconds: 300

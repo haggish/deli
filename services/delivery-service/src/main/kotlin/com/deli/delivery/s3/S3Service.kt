@@ -1,5 +1,6 @@
 package com.deli.delivery.s3
 
+import com.deli.shared.domain.model.InvalidImageException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -7,6 +8,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
@@ -68,7 +71,64 @@ class S3Service(
 
     fun generateSignatureDownloadUrl(key: String): String = generatePresignedGet(bucketSignatures, key)
 
-    // ── Private helpers ───────────────────────────────────────────────────────
+    // ── Post-upload validation ────────────────────────────────────────────────
+
+    /**
+     * Downloads the first 8 bytes of a photo object and checks its magic bytes.
+     * Throws [InvalidImageException] if the file header does not match the expected image format.
+     * The caller is responsible for deleting the object if validation fails.
+     */
+    fun validatePhotoMagicBytes(key: String) {
+        val extension = key.substringAfterLast('.')
+        val expectedContentType =
+            when (extension) {
+                "jpeg", "jpg" -> "image/jpeg"
+                "png" -> "image/png"
+                else -> throw InvalidImageException("Unsupported file type: $extension")
+            }
+
+        val getRequest =
+            GetObjectRequest
+                .builder()
+                .bucket(bucketPhotos)
+                .key(key)
+                .range("bytes=0-7")
+                .build()
+
+        val bytes = s3Client.getObjectAsBytes(getRequest).asByteArray()
+        checkMagicBytes(bytes, expectedContentType)
+    }
+
+    fun deletePhoto(key: String) {
+        s3Client.deleteObject(
+            DeleteObjectRequest
+                .builder()
+                .bucket(bucketPhotos)
+                .key(key)
+                .build(),
+        )
+        log.debug("Deleted invalid photo object: $bucketPhotos/$key")
+    }
+
+    // ── Private helpers ─────────────────────────────────────��─────────────────
+
+    private fun checkMagicBytes(
+        bytes: ByteArray,
+        contentType: String,
+    ) {
+        val magic =
+            when (contentType) {
+                "image/jpeg" -> byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())
+
+                "image/png" -> byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47)
+
+                // \x89PNG
+                else -> throw InvalidImageException("Unsupported content type: $contentType")
+            }
+        if (bytes.size < magic.size || !bytes.take(magic.size).toByteArray().contentEquals(magic)) {
+            throw InvalidImageException("File header does not match declared content type $contentType")
+        }
+    }
 
     private fun generatePresignedPut(
         bucket: String,

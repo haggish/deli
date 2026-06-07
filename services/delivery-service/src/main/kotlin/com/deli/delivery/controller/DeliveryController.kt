@@ -9,6 +9,7 @@ import com.deli.shared.api.response.ApiResponse
 import com.deli.shared.api.response.DeliveryConfirmationResponse
 import com.deli.shared.api.response.PhotoUploadUrlResponse
 import jakarta.validation.Valid
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,13 +24,26 @@ import java.util.UUID
 class DeliveryController(
     private val deliveryService: DeliveryService,
 ) {
+    private fun currentUserId(): UUID =
+        UUID.fromString(SecurityContextHolder.getContext().authentication?.principal as? String)
+
+    private fun currentUserRole(): String =
+        SecurityContextHolder
+            .getContext()
+            .authentication
+            ?.authorities
+            ?.firstOrNull()
+            ?.authority
+            ?.removePrefix("ROLE_")
+            ?: "UNKNOWN"
+
     // ── GET /api/deliveries/stops/{stopId} ─────────────────────────────────────
 
     @GetMapping("/stops/{stopId}")
     fun getDelivery(
         @PathVariable stopId: UUID,
     ): ApiResponse<DeliveryConfirmationResponse> {
-        val record = deliveryService.getByStopId(stopId)
+        val record = deliveryService.getByStopId(stopId, currentUserId(), currentUserRole())
         return ApiResponse.ok(record.toResponse())
     }
 
@@ -40,7 +54,7 @@ class DeliveryController(
         @PathVariable stopId: UUID,
         @Valid @RequestBody request: ConfirmDeliveryRequest,
     ): ApiResponse<DeliveryConfirmationResponse> {
-        val record = deliveryService.confirmDelivery(stopId, request)
+        val record = deliveryService.confirmDelivery(stopId, request, currentUserId())
         return ApiResponse.ok(record.toResponse())
     }
 
@@ -51,7 +65,7 @@ class DeliveryController(
         @PathVariable stopId: UUID,
         @Valid @RequestBody request: ReportFailedDeliveryRequest,
     ): ApiResponse<DeliveryConfirmationResponse> {
-        val record = deliveryService.reportFailure(stopId, request)
+        val record = deliveryService.reportFailure(stopId, request, currentUserId())
         return ApiResponse.ok(record.toResponse())
     }
 
@@ -61,7 +75,7 @@ class DeliveryController(
     fun getPhotoUploadUrl(
         @Valid @RequestBody request: RequestPhotoUploadUrlRequest,
     ): ApiResponse<PhotoUploadUrlResponse> {
-        val result = deliveryService.getPhotoUploadUrl(request)
+        val result = deliveryService.getPhotoUploadUrl(request, currentUserId())
         return ApiResponse.ok(
             PhotoUploadUrlResponse(
                 uploadUrl = result.uploadUrl,
@@ -77,7 +91,7 @@ class DeliveryController(
     fun getSignatureUploadUrl(
         @PathVariable stopId: UUID,
     ): ApiResponse<PhotoUploadUrlResponse> {
-        val result = deliveryService.getSignatureUploadUrl(stopId)
+        val result = deliveryService.getSignatureUploadUrl(stopId, currentUserId())
         return ApiResponse.ok(
             PhotoUploadUrlResponse(
                 uploadUrl = result.uploadUrl,
@@ -99,7 +113,7 @@ class DeliveryController(
                 com.deli.shared.api.response
                     .ApiError("MISSING_FIELD", "fileKey is required"),
             )
-        val record = deliveryService.recordPhotoUploaded(stopId, fileKey)
+        val record = deliveryService.recordPhotoUploaded(stopId, fileKey, currentUserId())
         return ApiResponse.ok(record.toResponse())
     }
 

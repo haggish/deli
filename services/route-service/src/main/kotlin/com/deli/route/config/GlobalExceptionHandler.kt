@@ -3,6 +3,7 @@ package com.deli.route.config
 import com.deli.shared.api.response.ApiError
 import com.deli.shared.api.response.ApiResponse
 import com.deli.shared.domain.model.DeliException
+import com.deli.shared.domain.model.ForbiddenException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,6 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(javaClass)
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleForbidden(ex: ForbiddenException): ResponseEntity<ApiResponse<Nothing>> =
+        ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(ApiResponse.error(ApiError("FORBIDDEN", ex.message ?: "Access denied")))
 
     @ExceptionHandler(DeliException::class)
     fun handleDomainException(ex: DeliException): ResponseEntity<ApiResponse<Nothing>> {

@@ -8,6 +8,7 @@ import com.deli.route.repository.StopRepository
 import com.deli.shared.api.request.AddressRequest
 import com.deli.shared.api.request.StartShiftRequest
 import com.deli.shared.domain.model.DeliveryStatus
+import com.deli.shared.domain.model.ForbiddenException
 import com.deli.shared.domain.model.ShiftNotActiveException
 import com.deli.shared.domain.model.ShiftNotFoundException
 import com.deli.shared.domain.model.ShiftStatus
@@ -66,6 +67,8 @@ class RouteService(
             shiftRepository.findByIdWithStops(shiftId)
                 ?: throw ShiftNotFoundException(ShiftId.of(shiftId))
 
+        if (shift.courierId != courierId) throw ForbiddenException("Shift does not belong to this courier")
+
         shift.status = ShiftStatus.COMPLETED
         shift.completedAt = Instant.now()
         val saved = shiftRepository.save(shift)
@@ -80,7 +83,19 @@ class RouteService(
         shiftRepository.findByCourierIdAndStatus(courierId, ShiftStatus.ACTIVE).firstOrNull()
 
     @Transactional(readOnly = true)
-    fun getShiftWithStops(shiftId: UUID): Shift =
+    fun getShiftWithStops(
+        shiftId: UUID,
+        requestingUserId: UUID,
+    ): Shift {
+        val shift =
+            shiftRepository.findByIdWithStops(shiftId)
+                ?: throw ShiftNotFoundException(ShiftId.of(shiftId))
+        if (shift.courierId != requestingUserId) throw ForbiddenException("Shift does not belong to this courier")
+        return shift
+    }
+
+    @Transactional(readOnly = true)
+    fun getShiftWithStopsInternal(shiftId: UUID): Shift =
         shiftRepository.findByIdWithStops(shiftId)
             ?: throw ShiftNotFoundException(ShiftId.of(shiftId))
 
@@ -98,6 +113,8 @@ class RouteService(
         val shift =
             shiftRepository.findByIdWithStops(shiftId)
                 ?: throw ShiftNotFoundException(ShiftId.of(shiftId))
+
+        if (shift.courierId != courierId) throw ForbiddenException("Shift does not belong to this courier")
 
         if (shift.status != ShiftStatus.ACTIVE) {
             throw ShiftNotActiveException(ShiftId.of(shiftId))
@@ -132,11 +149,16 @@ class RouteService(
         return stop
     }
 
-    fun markStopInProgress(stopId: UUID): Stop {
+    fun markStopInProgress(
+        stopId: UUID,
+        requestingUserId: UUID,
+    ): Stop {
         val stop =
             stopRepository.findById(stopId).orElseThrow {
                 StopNotFoundException(StopId.of(stopId))
             }
+
+        if (stop.courierId != requestingUserId) throw ForbiddenException("Stop does not belong to this courier")
 
         if (stop.status == StopStatus.COMPLETED) {
             throw StopAlreadyCompletedException(StopId.of(stopId))
@@ -152,11 +174,14 @@ class RouteService(
         stopId: UUID,
         deliveryStatus: DeliveryStatus,
         courierNote: String? = null,
+        requestingUserId: UUID,
     ): Stop {
         val stop =
             stopRepository.findById(stopId).orElseThrow {
                 StopNotFoundException(StopId.of(stopId))
             }
+
+        if (stop.courierId != requestingUserId) throw ForbiddenException("Stop does not belong to this courier")
 
         if (stop.status == StopStatus.COMPLETED) {
             throw StopAlreadyCompletedException(StopId.of(stopId))
@@ -187,8 +212,15 @@ class RouteService(
     fun getStopsForShift(shiftId: UUID): List<Stop> = stopRepository.findByShiftIdOrderBySequenceNumber(shiftId)
 
     @Transactional(readOnly = true)
-    fun getStop(stopId: UUID): Stop =
-        stopRepository.findById(stopId).orElseThrow {
-            StopNotFoundException(StopId.of(stopId))
-        }
+    fun getStop(
+        stopId: UUID,
+        requestingUserId: UUID,
+    ): Stop {
+        val stop =
+            stopRepository.findById(stopId).orElseThrow {
+                StopNotFoundException(StopId.of(stopId))
+            }
+        if (stop.courierId != requestingUserId) throw ForbiddenException("Stop does not belong to this courier")
+        return stop
+    }
 }

@@ -13,12 +13,12 @@ import com.deli.shared.api.response.ShiftSummaryResponse
 import com.deli.shared.api.response.StopResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -29,18 +29,20 @@ import java.util.UUID
 class RouteController(
     private val routeService: RouteService,
 ) {
+    private fun currentUserId(): UUID =
+        UUID.fromString(SecurityContextHolder.getContext().authentication?.principal as? String)
+
     // ── GET /api/routes/active ────────────────────────────────────────────────
     // Returns the active shift and its ordered stops for the calling courier
 
     @GetMapping("/active")
-    fun getActiveRoute(
-        @RequestHeader("X-User-Id") userId: String,
-    ): ApiResponse<RouteResponse?> {
+    fun getActiveRoute(): ApiResponse<RouteResponse?> {
+        val userId = currentUserId()
         val shift =
-            routeService.getActiveShift(UUID.fromString(userId))
+            routeService.getActiveShift(userId)
                 ?: return ApiResponse.ok(null)
 
-        val fullShift = routeService.getShiftWithStops(shift.id)
+        val fullShift = routeService.getShiftWithStopsInternal(shift.id)
         return ApiResponse.ok(fullShift.toRouteResponse())
     }
 
@@ -49,10 +51,9 @@ class RouteController(
     @PostMapping("/shifts")
     @ResponseStatus(HttpStatus.CREATED)
     fun startShift(
-        @RequestHeader("X-User-Id") userId: String,
         @Valid @RequestBody request: StartShiftRequest,
     ): ApiResponse<ShiftSummaryResponse> {
-        val shift = routeService.startShift(UUID.fromString(userId), request)
+        val shift = routeService.startShift(currentUserId(), request)
         return ApiResponse.ok(shift.toSummaryResponse())
     }
 
@@ -60,10 +61,9 @@ class RouteController(
 
     @PatchMapping("/shifts/{shiftId}/complete")
     fun completeShift(
-        @RequestHeader("X-User-Id") userId: String,
         @PathVariable shiftId: UUID,
     ): ApiResponse<ShiftSummaryResponse> {
-        val shift = routeService.completeShift(UUID.fromString(userId), shiftId)
+        val shift = routeService.completeShift(currentUserId(), shiftId)
         return ApiResponse.ok(shift.toSummaryResponse())
     }
 
@@ -73,7 +73,7 @@ class RouteController(
     fun getShift(
         @PathVariable shiftId: UUID,
     ): ApiResponse<RouteResponse> {
-        val shift = routeService.getShiftWithStops(shiftId)
+        val shift = routeService.getShiftWithStops(shiftId, currentUserId())
         return ApiResponse.ok(shift.toRouteResponse())
     }
 
@@ -83,7 +83,7 @@ class RouteController(
     fun startStop(
         @PathVariable stopId: UUID,
     ): ApiResponse<StopResponse> {
-        val stop = routeService.markStopInProgress(stopId)
+        val stop = routeService.markStopInProgress(stopId, currentUserId())
         return ApiResponse.ok(stop.toResponse())
     }
 
@@ -92,16 +92,16 @@ class RouteController(
     @PostMapping("/shifts/{shiftId}/stops")
     @ResponseStatus(HttpStatus.CREATED)
     fun addStop(
-        @RequestHeader("X-User-Id") userId: String,
         @PathVariable shiftId: UUID,
         @RequestBody body: AddStopRequest,
     ): ApiResponse<StopResponse> {
+        val userId = currentUserId()
         val stop =
             routeService.addStop(
                 shiftId = shiftId,
                 packageId = UUID.fromString(body.packageId),
                 customerId = UUID.fromString(body.customerId),
-                courierId = UUID.fromString(userId),
+                courierId = userId,
                 address = body.address,
                 latitude = body.latitude,
                 longitude = body.longitude,
@@ -115,7 +115,7 @@ class RouteController(
     fun getStop(
         @PathVariable stopId: UUID,
     ): ApiResponse<StopResponse> {
-        val stop = routeService.getStop(stopId)
+        val stop = routeService.getStop(stopId, currentUserId())
         return ApiResponse.ok(stop.toResponse())
     }
 
@@ -124,7 +124,7 @@ class RouteController(
         @PathVariable stopId: UUID,
         @RequestBody body: CompleteStopRequest,
     ): ApiResponse<StopResponse> {
-        val stop = routeService.markStopCompleted(stopId, body.deliveryStatus, body.courierNote)
+        val stop = routeService.markStopCompleted(stopId, body.deliveryStatus, body.courierNote, currentUserId())
         return ApiResponse.ok(stop.toResponse())
     }
 

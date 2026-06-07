@@ -9,6 +9,7 @@ import com.deli.shared.api.request.ConfirmDeliveryRequest
 import com.deli.shared.api.request.ReportFailedDeliveryRequest
 import com.deli.shared.api.request.RequestPhotoUploadUrlRequest
 import com.deli.shared.domain.model.DeliveryStatus
+import com.deli.shared.domain.model.ForbiddenException
 import com.deli.shared.domain.model.StopAlreadyCompletedException
 import com.deli.shared.domain.model.StopNotFoundException
 import com.deli.shared.domain.valueobject.StopId
@@ -30,9 +31,23 @@ class DeliveryService(
     // ── Query ─────────────────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
-    fun getByStopId(stopId: UUID): DeliveryRecord =
-        deliveryRecordRepository.findByStopId(stopId)
-            ?: throw StopNotFoundException(StopId.of(stopId))
+    fun getByStopId(
+        stopId: UUID,
+        requestingUserId: UUID,
+        role: String,
+    ): DeliveryRecord {
+        val record =
+            deliveryRecordRepository.findByStopId(stopId)
+                ?: throw StopNotFoundException(StopId.of(stopId))
+        val allowed =
+            when (role) {
+                "COURIER" -> record.courierId == requestingUserId
+                "CUSTOMER" -> record.customerId == requestingUserId
+                else -> false
+            }
+        if (!allowed) throw ForbiddenException()
+        return record
+    }
 
     @Transactional(readOnly = true)
     fun getByPackageId(packageId: UUID): DeliveryRecord? = deliveryRecordRepository.findByPackageId(packageId)
@@ -42,10 +57,13 @@ class DeliveryService(
     fun confirmDelivery(
         stopId: UUID,
         request: ConfirmDeliveryRequest,
+        requestingUserId: UUID,
     ): DeliveryRecord {
         val record =
             deliveryRecordRepository.findByStopId(stopId)
                 ?: throw StopNotFoundException(StopId.of(stopId))
+
+        if (record.courierId != requestingUserId) throw ForbiddenException()
 
         if (record.status == DeliveryStatus.DELIVERED || record.status == DeliveryStatus.FAILED) {
             throw StopAlreadyCompletedException(StopId.of(stopId))
@@ -69,10 +87,13 @@ class DeliveryService(
     fun reportFailure(
         stopId: UUID,
         request: ReportFailedDeliveryRequest,
+        requestingUserId: UUID,
     ): DeliveryRecord {
         val record =
             deliveryRecordRepository.findByStopId(stopId)
                 ?: throw StopNotFoundException(StopId.of(stopId))
+
+        if (record.courierId != requestingUserId) throw ForbiddenException()
 
         if (record.status == DeliveryStatus.DELIVERED || record.status == DeliveryStatus.FAILED) {
             throw StopAlreadyCompletedException(StopId.of(stopId))
@@ -92,18 +113,29 @@ class DeliveryService(
 
     // ── S3 pre-signed URLs ────────────────────────────────────────────────────
 
-    fun getPhotoUploadUrl(request: RequestPhotoUploadUrlRequest): PresignedUpload {
-        val stopId = request.stopId
-        // Verify the stop exists
-        deliveryRecordRepository.findByStopId(UUID.fromString(stopId))
-            ?: throw StopNotFoundException(StopId.of(UUID.fromString(stopId)))
+    fun getPhotoUploadUrl(
+        request: RequestPhotoUploadUrlRequest,
+        requestingUserId: UUID,
+    ): PresignedUpload {
+        val stopId = UUID.fromString(request.stopId)
+        val record =
+            deliveryRecordRepository.findByStopId(stopId)
+                ?: throw StopNotFoundException(StopId.of(stopId))
 
-        return s3Service.generatePhotoUploadUrl(stopId, request.contentType)
+        if (record.courierId != requestingUserId) throw ForbiddenException()
+
+        return s3Service.generatePhotoUploadUrl(request.stopId, request.contentType)
     }
 
-    fun getSignatureUploadUrl(stopId: UUID): PresignedUpload {
-        deliveryRecordRepository.findByStopId(stopId)
-            ?: throw StopNotFoundException(StopId.of(stopId))
+    fun getSignatureUploadUrl(
+        stopId: UUID,
+        requestingUserId: UUID,
+    ): PresignedUpload {
+        val record =
+            deliveryRecordRepository.findByStopId(stopId)
+                ?: throw StopNotFoundException(StopId.of(stopId))
+
+        if (record.courierId != requestingUserId) throw ForbiddenException()
 
         return s3Service.generateSignatureUploadUrl(stopId.toString())
     }
@@ -113,10 +145,20 @@ class DeliveryService(
     fun recordPhotoUploaded(
         stopId: UUID,
         fileKey: String,
+        requestingUserId: UUID,
     ): DeliveryRecord {
         val record =
             deliveryRecordRepository.findByStopId(stopId)
                 ?: throw StopNotFoundException(StopId.of(stopId))
+
+        if (record.courierId != requestingUserId) throw ForbiddenException()
+
+        try {
+            s3Service.validatePhotoMagicBytes(fileKey)
+        } catch (e: com.deli.shared.domain.model.InvalidImageException) {
+            s3Service.deletePhoto(fileKey)
+            throw e
+        }
 
         record.proofPhotoKey = fileKey
         record.updatedAt = Instant.now()
@@ -126,10 +168,13 @@ class DeliveryService(
     fun recordSignatureUploaded(
         stopId: UUID,
         fileKey: String,
+        requestingUserId: UUID,
     ): DeliveryRecord {
         val record =
             deliveryRecordRepository.findByStopId(stopId)
                 ?: throw StopNotFoundException(StopId.of(stopId))
+
+        if (record.courierId != requestingUserId) throw ForbiddenException()
 
         record.signatureKey = fileKey
         record.updatedAt = Instant.now()
