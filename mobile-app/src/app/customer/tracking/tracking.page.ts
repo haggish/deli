@@ -1,6 +1,7 @@
 import {
   Component, OnInit, OnDestroy, OnChanges,
   signal, computed, ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -98,6 +99,7 @@ import {ActivatedRoute} from "@angular/router";
 
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar {
       --background: #0a0a14;

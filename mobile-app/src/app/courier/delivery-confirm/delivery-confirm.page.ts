@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
@@ -158,6 +158,7 @@ const FAILURE_REASONS: { value: FailureReason; label: string }[] = [
 
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar { --background: #0f0f0f; --color: #fff; --border-color: #222; }
     .confirm-content { --background: #0f0f0f; }

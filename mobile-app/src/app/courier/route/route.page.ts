@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { SlicePipe } from "@angular/common";
 import {
@@ -114,6 +114,7 @@ import { StopResponse, StopStatus } from '../../shared/models/api.models';
 
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar { --background: #0f0f0f; --color: #fff; --border-color: #222; }
     ion-title { font-weight: 700; }

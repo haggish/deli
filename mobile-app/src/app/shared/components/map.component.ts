@@ -9,6 +9,7 @@ import {
   ViewChild,
   AfterViewInit,
   NgZone,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 export interface MapMarker {
@@ -33,6 +34,7 @@ export interface MapMarker {
   selector: 'app-map',
   standalone: true,
   template: `<div #mapContainer class="map-container"></div>`,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     :host { display: block; width: 100%; }
 

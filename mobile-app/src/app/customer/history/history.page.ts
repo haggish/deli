@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonIcon,
 } from '@ionic/angular/standalone';
@@ -23,6 +23,7 @@ import { timeOutline } from 'ionicons/icons';
       </div>
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar { --background: #0a0a14; --color: #fff; --border-color: #1a1a2e; }
     .history-content { --background: #0a0a14; }
