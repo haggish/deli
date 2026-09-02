@@ -34,7 +34,7 @@ The system is built as a Gradle monorepo so shared code (domain model, DTOs, Kaf
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          MOBILE APP                                 │
-│         Ionic 8 / Angular 19 / Capacitor 6                         │
+│      Ionic 9 / Angular 22 / Capacitor 8 / TypeScript 6             │
 │                                                                     │
 │   ┌──────────────────┐          ┌──────────────────────────────┐   │
 │   │  Courier views   │          │      Customer views           │   │
@@ -94,7 +94,8 @@ deli/
 │       └── deli-services/            # services chart (Deployments, ConfigMaps)
 │
 ├── scripts/                          # reset-state.sh, inject-gps.sh
-├── docs/                             # e2e-test.sh, this document
+├── docs/                             # e2e-test.sh
+├── specs/                            # this document, workflow.md, mobile.md, handoff.md
 └── docker-compose.yml
 ```
 
@@ -487,9 +488,13 @@ Services:
   CourierPositionCache  HTTP poll of /api/locations/couriers/{id}
 ```
 
-**Signals over RxJS in components:** Angular 19 signals (`signal()`, `computed()`) replace `BehaviorSubject` chains in component state. Signals are synchronous, do not require `async` pipes, and automatically track dependencies without subscription management. RxJS is kept only in services where it belongs — HTTP calls, polling intervals.
+**Signals over RxJS in components:** Angular signals (`signal()`, `computed()`) replace `BehaviorSubject` chains in component state. Signals are synchronous, do not require `async` pipes, and automatically track dependencies without subscription management. RxJS is kept only in services where it belongs — HTTP calls, polling intervals.
 
 **Standalone components:** no `NgModule` declarations. Each component, page, and guard declares its own imports. Tree-shaking is more aggressive — the login page bundle includes only the Ionic components it actually uses.
+
+Ionic 9 removed the `@ionic/angular/standalone` subpath export and promoted standalone to the package root, so these imports come from `@ionic/angular` directly.
+
+**Angular 22 compatibility shims:** the v22 `ng update` migration added `changeDetection: ChangeDetectionStrategy.Eager` to every component and `provideHttpClient(withXhr(), …)` in `main.ts`. Both preserve pre-v22 defaults (v22 changed the default change-detection strategy and switched HttpClient to the fetch backend). Migrating the components to `OnPush` and dropping `withXhr()` are open follow-ups, not current design intent.
 
 **Leaflet maps:**
 - Dynamically imported (`await import('leaflet')`) to avoid SSR issues and reduce initial bundle
@@ -523,7 +528,7 @@ LocationWebSocketHandler (location-service)
 ```
 docker-compose.yml
 ├── deli-postgres     PostgreSQL 16 :5432   schemas: public, route, delivery
-├── deli-timescale    TimescaleDB :5433     schema: gps (hypertable)
+├── deli-timescaledb    TimescaleDB :5433     schema: gps (hypertable)
 ├── deli-redis        Redis 7.4 :6379       position cache, FCM tokens
 ├── deli-kafka        Apache Kafka 3.7 :9094 KRaft mode (no ZooKeeper)
 ├── deli-kafka-ui     Kafbat Kafka UI :8090
@@ -551,14 +556,14 @@ deli-services chart
 ├── delivery-service Deployment, 2 replicas
 ├── location-service Deployment, 2 replicas
 └── notification-service Deployment, 2 replicas
-
-deli-common library chart
-└── Shared templates: Deployment, Service, ConfigMap, HPA
 ```
 
-**Why direct StatefulSet templates over Bitnami charts?** Bitnami chart image tags became broken (digest mismatches) at the time of writing. Direct StatefulSets with pinned official image tags are more predictable — no chart wrapper to debug, and the image used locally in Docker Compose is identical to the one in Kubernetes.
+Only these two charts exist under `infra/helm/`, alongside the `build-images.sh`
+and `deploy-local.sh` helper scripts. (An earlier revision of this document
+described a third `deli-common` library chart holding shared Deployment/Service
+templates; it was never added to the repository.)
 
-**`deli-common` library chart:** the five service charts share identical Deployment and Service templates (container ports, readiness probes, environment variable injection from ConfigMap/Secret). The library chart provides these templates once; each service chart overrides only its specific values (image name, port, replica count).
+**Why direct StatefulSet templates over Bitnami charts?** Bitnami chart image tags became broken (digest mismatches) at the time of writing. Direct StatefulSets with pinned official image tags are more predictable — no chart wrapper to debug, and the image used locally in Docker Compose is identical to the one in Kubernetes.
 
 ---
 
@@ -596,6 +601,8 @@ Developer pushes code
 
 **Path filters:** each workflow declares `paths:` so only relevant changes trigger builds. A CSS change in the mobile app does not trigger a 20-minute Gradle build.
 
+**Branch targeting:** all three workflows target `master`. They previously referenced a `main` branch that has never existed in this repository — `cd-docker.yml` triggered on `push: branches: [main]` and both CI workflows declared `pull_request: branches: [main, develop]`. The consequence was that no image was ever pushed to ghcr.io, and PR checks ran only via the catch-all `push: branches: ["**"]` trigger. `ci-mobile.yml` pins `node-version: "24"` (Angular 22's CLI floor).
+
 **Concurrency groups with asymmetric cancel policy:** CI workflows use `cancel-in-progress: true` — if you push twice quickly, only the second run matters. The Docker push workflow uses `cancel-in-progress: false` — cancelling a push mid-way leaves the registry in a partial state.
 
 **Layered Docker images:** Spring Boot's `jarmode=layertools` splits the fat JAR into four layers in dependency order:
@@ -613,17 +620,17 @@ On a typical commit, Docker pushes only the `application` layer. The first push 
 
 ## 16. Key Technical Decisions
 
-### Gradle 8.8, not 8.11+
+### Gradle 9.5.1
 
-Gradle 8.11+ introduced a bug in Kotlin DSL metadata serialisation that caused `build.gradle.kts` files to fail with obscure `metadata.bin` errors. Gradle 8.8 is stable with Kotlin 2.1 and Spring Boot 3.4.
+The project originally pinned Gradle 8.8 because 8.11+ introduced a Kotlin DSL `metadata.bin` serialisation bug. That constraint no longer applies — the wrapper is now on **9.5.1**, running Kotlin 2.4 and Spring Boot 4.0.
 
 ### No Detekt
 
-Detekt 1.x is incompatible with Kotlin 2.1 (the K2 compiler). Detekt 2.x (K2-compatible) was still in alpha at the time of writing. ktlint handles formatting; Detekt will be re-enabled when 2.0 stable releases.
+Detekt 1.x is incompatible with the K2 compiler (the project is on Kotlin 2.4). Detekt 2.x (K2-compatible) is still pre-stable. ktlint handles formatting; Detekt will be re-enabled when 2.0 stable releases. The plugin is commented out in `buildSrc/src/main/kotlin/deli.spring-service.gradle.kts`.
 
-### `configuration-cache=false`
+### `configuration-cache=true`
 
-Gradle's configuration cache conflicts with several Spring Boot Gradle plugin features. It is explicitly disabled in `gradle.properties` to avoid intermittent cache poisoning errors.
+The configuration cache was originally disabled because it conflicted with several Spring Boot Gradle plugin features. It is now **enabled** in `gradle.properties`, and builds no longer need `--no-configuration-cache`.
 
 ### `@JvmInline` value classes for all IDs
 
@@ -651,7 +658,7 @@ The customer tracking screen polls `GET /api/locations/couriers/{id}` every 10 s
 
 ### `@else if` without `as` in Angular templates
 
-Angular 19's new control flow syntax (`@if`, `@else if`) only supports the `as` alias expression on the primary `@if` block. `@else if (signal(); as x)` is a compile error. The workaround is to use `@else if (signal())` and dereference with `signal()!.property` in the template body, or restructure to use nested `@if` blocks.
+Angular's control flow syntax (`@if`, `@else if`) only supports the `as` alias expression on the primary `@if` block. `@else if (signal(); as x)` is a compile error. The workaround is to use `@else if (signal())` and dereference with `signal()!.property` in the template body, or restructure to use nested `@if` blocks.
 
 ---
 
