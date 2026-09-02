@@ -29,22 +29,22 @@ route      delivery   location  notification
 
 | Layer | Technology |
 |---|---|
-| Mobile | Ionic 8 / Angular 21 / Capacitor 8 |
+| Mobile | Ionic 9 / Angular 22 / Capacitor 8 / TypeScript 6 |
 | Gateway | Spring Cloud Gateway / Spring Boot 4.0 |
-| Services | Kotlin 2.3 / Spring Boot 4.0 |
-| Messaging | Apache Kafka 3.9 (KRaft) |
+| Services | Kotlin 2.4 / Spring Boot 4.0 |
+| Messaging | Apache Kafka (KRaft) — broker 3.7, client 3.9 |
 | Primary DB | PostgreSQL 16 |
 | Time-series | TimescaleDB 2.14 |
 | Cache | Redis 7.4 |
 | Object store | MinIO |
-| Build | Gradle 9.4 (Kotlin DSL) |
+| Build | Gradle 9.5.1 (Kotlin DSL) |
 | Deploy | Kubernetes / Helm |
 
 ## Prerequisites
 
 - WSL 2 with project in native filesystem (`~/projects/deli`)
 - Java 21 (Eclipse Temurin)
-- Node.js 22+
+- Node.js 24 (CI pins 24; Angular 22's CLI requires >= 22.22.3, >= 24.15.0, or >= 26.0.0)
 - Docker Desktop with Kubernetes enabled
 - Helm 3.x
 
@@ -290,9 +290,13 @@ deli/
 |---|---|---|
 | ci-backend.yml | Push (Kotlin files) | Build + test + ktlint |
 | ci-mobile.yml | Push (mobile-app/) | Type-check + build |
-| cd-docker.yml | Merge to main | Push images to ghcr.io |
+| cd-docker.yml | Push to `master` (services/shared/buildSrc paths) | Push images to ghcr.io |
 
 Enable write permissions: **Settings → Actions → General → Read and write permissions**
+
+All three workflows target `master`. They previously referenced a `main` branch
+that does not exist in this repository, which meant `cd-docker.yml` never ran at
+all and PR checks fired only through the catch-all `push` trigger.
 
 ## Kubernetes Deployment
 
@@ -309,5 +313,12 @@ Enable write permissions: **Settings → Actions → General → Read and write 
 
 - No dedicated package service — packages created via route-service API
 - Customer tracking requires `?courierId=` parameter manually — needs delivery→courier lookup
-- Detekt disabled pending detekt 2.0 stable (Kotlin 2.1 support)
+- Detekt disabled pending detekt 2.0 stable (K2 / Kotlin 2.4 support)
 - Signature capture UI not yet implemented (S3 infrastructure is ready)
+- `npm run lint` fails — no lint target is configured in `angular.json` and
+  `angular-eslint` is not installed
+- `gradlew` is checked out with CRLF line endings under `core.autocrlf=true`,
+  which breaks its shebang on WSL/Linux (`./gradlew` → "No such file or
+  directory"). Fix with `git config core.autocrlf input` and re-checkout, or
+  add a `.gitattributes` entry pinning `gradlew` to LF. CI is unaffected —
+  GitHub runners check out with LF.
