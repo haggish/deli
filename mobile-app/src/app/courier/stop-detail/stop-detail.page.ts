@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle,
@@ -129,6 +129,7 @@ import { MapComponent, MapMarker } from '../../shared/components/map.component';
       }
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar { --background: #0f0f0f; --color: #fff; --border-color: #222; }
     .stop-content { --background: #0f0f0f; }

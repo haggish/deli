@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { locateOutline, timeOutline } from 'ionicons/icons';
@@ -21,6 +21,7 @@ import { locateOutline, timeOutline } from 'ionicons/icons';
       </ion-tab-bar>
     </ion-tabs>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-tab-bar {
       --background: #0a0a14;

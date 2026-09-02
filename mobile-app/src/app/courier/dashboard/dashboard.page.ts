@@ -1,4 +1,4 @@
-import { Component, OnDestroy, signal, computed } from '@angular/core';
+import { Component, OnDestroy, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   IonContent,
@@ -133,6 +133,7 @@ import { Router } from '@angular/router';
 
     </ion-content>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     ion-toolbar {
       --background: #0f0f0f;
