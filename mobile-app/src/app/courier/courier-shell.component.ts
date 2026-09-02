@@ -5,7 +5,7 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { homeOutline, mapOutline, personOutline } from 'ionicons/icons';
 

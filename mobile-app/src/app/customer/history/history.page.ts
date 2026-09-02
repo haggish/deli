@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonIcon,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { timeOutline } from 'ionicons/icons';
 

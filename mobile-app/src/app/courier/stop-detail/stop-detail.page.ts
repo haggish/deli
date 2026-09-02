@@ -4,7 +4,7 @@ import {
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonButton, IonIcon, IonSpinner, IonBackButton,
   IonButtons, IonChip, IonLabel, ToastController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { navigateOutline, copyOutline, warningOutline, ribbonOutline, cashOutline } from 'ionicons/icons';
 import { RouteApiService } from '../../shared/services/route-api.service';

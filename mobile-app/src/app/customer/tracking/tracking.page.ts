@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { interval, Subscription, switchMap, catchError, of } from 'rxjs';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle, IonSpinner, IonIcon,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { locateOutline, alertCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../../shared/services/auth.service';

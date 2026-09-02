@@ -12,7 +12,7 @@ import {
   IonSpinner,
   IonIcon,
   AlertController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { wifiOutline, navigateOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { RouteApiService } from '../../shared/services/route-api.service';
