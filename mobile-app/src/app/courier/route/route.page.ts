@@ -15,7 +15,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherCustomEvent,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   checkmarkCircle,

@@ -7,7 +7,7 @@ import {
   IonButtons, IonSegment, IonSegmentButton, IonLabel,
   IonTextarea, IonItem,
   ToastController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkOutline, closeOutline } from 'ionicons/icons';
 import { DeliveryApiService } from '../../shared/services/route-api.service';

@@ -9,7 +9,7 @@ import {
   IonSpinner,
   IonText,
   ToastController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
