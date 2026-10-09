@@ -276,44 +276,44 @@ curl -s "http://localhost:8080/api/locations/couriers/fb30f9fa-0337-44b7-a32f-93
 ### Build everything
 
 ```bash
-./gradlew build --no-configuration-cache
+./gradlew build
 ```
 
 ### Build a single service
 
 ```bash
-./gradlew :services:route-service:build --no-configuration-cache
+./gradlew :services:route-service:build
 ```
 
 ### Build without running tests
 
 ```bash
-./gradlew build -x test --no-configuration-cache
+./gradlew build -x test
 ```
 
 ### Run tests only
 
 ```bash
-./gradlew test --no-configuration-cache
+./gradlew test
 ```
 
 ### Run ktlint (code style check)
 
 ```bash
-./gradlew ktlintCheck --no-configuration-cache
+./gradlew ktlintCheck
 ```
 
 ### Auto-fix ktlint violations
 
 ```bash
-./gradlew ktlintFormat --no-configuration-cache
+./gradlew ktlintFormat
 ```
 
 ### Build Docker images locally
 
 ```bash
 # Build JAR first
-./gradlew :services:api-gateway:bootJar --no-configuration-cache
+./gradlew :services:api-gateway:bootJar
 
 # Build Docker image
 docker build -t deli/api-gateway:local services/api-gateway/
@@ -354,7 +354,7 @@ SELECT id, email, role FROM gateway_users;
 ### TimescaleDB — query GPS pings
 
 ```bash
-docker exec deli-timescale psql -U gps_user -d gpsdb
+docker exec deli-timescaledb psql -U gps_user -d gpsdb
 ```
 
 ```sql
@@ -467,6 +467,19 @@ npm run build:prod
 npx tsc --noEmit
 ```
 
+### Unit tests (vitest)
+
+```bash
+npx ng test --watch=false
+```
+
+Tests run on vitest via the `@angular/build:unit-test` builder. There is no
+`--browsers` flag — older notes referencing `--browsers=ChromeHeadless` are from
+the Karma setup and will fail.
+
+> `npm run lint` does not work: `angular.json` declares no lint target and
+> `angular-eslint` is not installed.
+
 ### Clear Angular build cache (if hot-reload breaks)
 
 ```bash
@@ -506,6 +519,20 @@ docker compose down -v
 ---
 
 ## Common Errors and Fixes
+
+### `./gradlew: No such file or directory` (but the file exists)
+
+`gradlew` has been checked out with CRLF line endings, so its `#!/bin/sh\r`
+shebang is invalid on WSL/Linux. This repository is cloned with
+`core.autocrlf=true`. Fix it with:
+
+```bash
+git config core.autocrlf input
+git rm --cached -r . && git reset --hard        # re-checkout with LF
+```
+
+Or normalise just the wrapper: `sed -i 's/\r$//' gradlew`. CI is unaffected —
+GitHub runners check out with LF.
 
 ### `Failed to configure a DataSource — no profiles currently active`
 
@@ -558,10 +585,10 @@ Start mobile app     cd mobile-app && npm start
 Reset everything     ~/projects/deli/scripts/reset-state.sh
 Inject GPS           ~/projects/deli/scripts/inject-gps.sh
 Run E2E test         bash ~/projects/deli/docs/e2e-test.sh
-Build all            ./gradlew build --no-configuration-cache
-Run tests            ./gradlew test --no-configuration-cache
-Lint (ktlint)        ./gradlew ktlintCheck --no-configuration-cache
-Fix lint             ./gradlew ktlintFormat --no-configuration-cache
+Build all            ./gradlew build
+Run tests            ./gradlew test
+Lint (ktlint)        ./gradlew ktlintCheck
+Fix lint             ./gradlew ktlintFormat
 Kafka UI             http://localhost:8090
 MinIO console        http://localhost:9001
 Mobile app           http://localhost:8100

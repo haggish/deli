@@ -3,14 +3,14 @@
 ## Project Structure & Module Organization
 - Backend lives under `services/` with per-service Spring Boot modules (`api-gateway`, `route-service`, `delivery-service`, `location-service`, `notification-service`); shared contracts are in `shared/domain-model` (Kafka events) and `shared/common-api` (HTTP DTOs/filters).
 - Mobile Ionic/Angular app is in `mobile-app/`; assets and Capacitor configs stay co-located with feature folders.
-- Infrastructure and deployment assets sit in `infra/` (Helm charts, Docker init SQL) and `docker-compose.yml`; utility scripts are in `scripts/`; additional docs in `docs/`.
+- Infrastructure and deployment assets sit in `infra/` (Helm charts, Terraform for AWS/Azure, Docker init SQL) and `docker-compose.yml`; utility scripts are in `scripts/`; the E2E script is in `docs/`; long-form docs (architecture, workflow, mobile, handoff) are in `specs/`.
 
 ## Build, Test, and Development Commands
 - Start local infra: `docker compose up -d`.
 - Backend build + unit tests: `./gradlew build` (runs ktlint and tests across services).
 - Service dev loop: `./gradlew :services:api-gateway:bootRun` (swap module name/port per service).
 - Lint-only: `./gradlew ktlintCheck`; format: `./gradlew ktlintFormat`.
-- Mobile app: `cd mobile-app && npm install --legacy-peer-deps && npm start` for live reload; `npm test -- --watch=false --browsers=ChromeHeadless` for unit tests; `npm run lint` for Angular lint; production build via `npm run build:prod`.
+- Mobile app: `cd mobile-app && npm install --legacy-peer-deps && npm start` for live reload; `npm test -- --watch=false` for unit tests (vitest — there is no `--browsers` flag); `npx tsc --noEmit` for a type-check-only pass; production build via `npm run build:prod`. `npm run lint` currently fails — no lint target is configured in `angular.json`.
 - E2E curl flow lives in `docs/e2e-test.sh`; use it after backend + infra are up.
 
 ## Coding Style & Naming Conventions
