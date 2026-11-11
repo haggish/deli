@@ -24,7 +24,7 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 
 | Phase | What was built | Status |
 |---|---|---|
-| 1 | Monorepo scaffold, Gradle 8.8, buildSrc convention plugins, docker-compose | ✅ |
+| 1 | Monorepo scaffold, Gradle (originally 8.8, now 9.5.1), buildSrc convention plugins, docker-compose | ✅ |
 | 2 | Shared domain model — value objects, Kafka events, exceptions, HTTP DTOs | ✅ |
 | 3 | Helm charts — deli-platform (infra) + deli-services (microservices) | ✅ |
 | 4 | JWT authentication in API gateway (login, refresh, R2DBC, Flyway) | ✅ |
@@ -54,7 +54,7 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 │   ├── delivery-service/:8082  Confirm/fail, S3, Kafka consumer+publisher
 │   ├── location-service/:8083  WebSocket GPS, TimescaleDB, Redis, Kafka
 │   └── notification-service/:8084  FCM, Kafka consumers
-├── mobile-app/          Ionic 8 / Angular 19 / Capacitor 6
+├── mobile-app/          Ionic 9 / Angular 22 / Capacitor 8 / TypeScript 6
 ├── infra/
 │   ├── docker/postgres/init.sql
 │   └── helm/
@@ -64,10 +64,12 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 │   ├── reset-state.sh   wipe DB + Redis + Kafka
 │   └── inject-gps.sh    fake courier GPS position into Redis
 ├── docs/
-│   ├── e2e-test.sh      automated E2E test script
+│   └── e2e-test.sh      automated E2E test script
+├── specs/
 │   ├── architecture.md  full architecture document with diagrams
 │   ├── workflow.md      daily development commands cheatsheet
-│   └── mobile.md        real device testing guide (ngrok + Android)
+│   ├── mobile.md        real device testing guide (ngrok + Android)
+│   └── handoff.md       this document
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci-backend.yml
@@ -86,11 +88,12 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 
 | Layer | Technology | Version |
 |---|---|---|
-| Mobile | Ionic / Angular / Capacitor | 8 / 19 / 6 |
-| Gateway | Spring Cloud Gateway | Spring Boot 3.4 |
-| Services | Kotlin + Spring Boot | 2.1 / 3.4 |
-| Build | Gradle (Kotlin DSL) | 8.8 — NOT 8.11+ (metadata.bin bug) |
-| Messaging | Apache Kafka (KRaft) | 3.7 |
+| Mobile | Ionic / Angular / Capacitor | 9.0.1 / 22.1.4 / 8.3.4 |
+| Mobile toolchain | TypeScript / Node / vitest | 6.0.3 / 24 / 4.1 |
+| Gateway | Spring Cloud Gateway | Spring Boot 4.0.6 |
+| Services | Kotlin + Spring Boot | 2.4.0 / 4.0.6 |
+| Build | Gradle (Kotlin DSL) | 9.5.1, configuration cache enabled |
+| Messaging | Apache Kafka (KRaft) | broker 3.7.0, client 3.9.0 |
 | Primary DB | PostgreSQL | 16 |
 | Time-series | TimescaleDB | 2.14 (pg16) |
 | Cache | Redis | 7.4 |
@@ -116,7 +119,7 @@ configured with `BCryptVersion.$2B` to accept these.
 | Container | Port | Credentials |
 |---|---|---|
 | deli-postgres | 5432 | courier_user / courier_pass_local / courierdb |
-| deli-timescale | 5433 | gps_user / gps_pass_local / gpsdb |
+| deli-timescaledb | 5433 | gps_user / gps_pass_local / gpsdb |
 | deli-redis | 6379 | password: redis_local |
 | deli-kafka | 9094 (external) / 9092 (internal) | — |
 | deli-kafka-ui | 8090 | — |
@@ -131,12 +134,12 @@ without understanding the rationale.
 
 ### Gradle
 
-- **Version must be 8.8** — 8.11+ has a Kotlin DSL `metadata.bin` bug
-- `org.gradle.configuration-cache=false` in `gradle.properties` — Spring Boot Gradle plugin incompatibility
+- **Now on 9.5.1.** The old "must be 8.8, never 8.11+" pin (Kotlin DSL `metadata.bin` bug) no longer applies
+- `org.gradle.configuration-cache=true` in `gradle.properties` — the cache is now enabled and working; drop any `--no-configuration-cache` flags you find in older notes
 - No `plugins{}` block in root `build.gradle.kts`
 - `settings.gradle.kts` order: pluginManagement → dependencyResolutionManagement → rootProject.name → include()
 - buildSrc `dependencies` must include: kotlin-gradle-plugin, kotlin-serialization, kotlin-allopen, kotlin-noarg, spring-boot-gradle-plugin, dependency-management-plugin, ktlint-gradle
-- **Detekt is disabled** — incompatible with Kotlin 2.1. Detekt 2.x still in alpha at time of writing
+- **Detekt is disabled** — incompatible with the K2 compiler (project is on Kotlin 2.4). Detekt 2.x still pre-stable
 
 ### Domain Model Value Classes
 
@@ -212,7 +215,7 @@ spring:
 
 ### Angular / Mobile App
 
-- `zone.js`: must be `~0.15.0` for Angular 19.2 (not `~0.14.0`)
+- `zone.js`: is `~0.16.2` for Angular 22
 - `import 'zone.js'` must be the **first** line in `main.ts`
 - CSS in `angular.json` styles array — not `<link>` in `index.html`
 - `@else if (signal(); as x)` is **invalid** — `as` only works on primary `@if` block
@@ -223,6 +226,11 @@ spring:
 - `ionViewWillEnter()` for page reload on navigation (replaces `ngOnInit` for Ionic lifecycle)
 - Leaflet: dynamic import in `ngAfterViewInit`, run outside NgZone, CSS in `angular.json`
 - `@angular/cdk/clipboard` not installed — use `navigator.clipboard` directly
+- **Ionic 9:** the `@ionic/angular/standalone` subpath was removed; import standalone components from `@ionic/angular` directly
+- **Angular 22 shims:** every component carries `changeDetection: ChangeDetectionStrategy.Eager` and `main.ts` uses `provideHttpClient(withXhr(), …)`. Both were added by `ng update` to preserve pre-v22 defaults — they are compatibility shims, not deliberate design
+- **TypeScript 6:** `baseUrl` was removed from `tsconfig.json` (TS6 errors with `TS5101`). No `paths` are defined, so all imports are relative or bare package specifiers
+- Unit tests run on **vitest** via the `@angular/build:unit-test` builder — `ng test --watch=false`, with no `--browsers` flag. Karma is gone
+- `npm run lint` **fails**: `angular.json` has no lint target and `angular-eslint` is not installed
 
 ### Customer Tracking Page
 
@@ -253,7 +261,7 @@ URL format: `http://localhost:8100/customer/tracking?courierId=<courierId>`
 3. **Route optimisation not implemented** — stops ordered by insertion sequence
 4. **Signature capture UI missing** — S3 pre-signed URL infrastructure is ready but no
    signature pad component in the mobile app
-5. **Detekt disabled** — pending detekt 2.0 stable (Kotlin 2.1 support)
+5. **Detekt disabled** — pending detekt 2.0 stable (K2 / Kotlin 2.4 support)
 6. **`PATCH /api/routes/stops/{id}/complete` must be called manually** after
    `POST /api/deliveries/stops/{id}/confirm`. Long-term fix: delivery-service publishes
    a Kafka event → route-service consumes it to auto-complete the stop.
@@ -311,9 +319,9 @@ bash ~/projects/deli/docs/e2e-test.sh
 ### Build
 
 ```bash
-./gradlew build --no-configuration-cache
-./gradlew test --no-configuration-cache
-./gradlew ktlintCheck --no-configuration-cache
+./gradlew build
+./gradlew test
+./gradlew ktlintCheck
 ```
 
 ---
@@ -376,14 +384,19 @@ Then Kafka events for this courier will log:
 
 ## Documentation Files
 
-All documentation lives in `~/projects/deli/docs/`:
+Long-form documentation lives in `~/projects/deli/specs/`; only the E2E script is
+under `docs/`:
 
 | File | Contents |
 |---|---|
-| `architecture.md` | Full architecture with ASCII diagrams, decision rationale |
-| `workflow.md` | Complete daily development command reference |
-| `mobile.md` | Real device testing guide (ngrok, Android APK) |
-| `e2e-test.sh` | Automated E2E test script — run with `bash docs/e2e-test.sh` |
+| `specs/architecture.md` | Full architecture with ASCII diagrams, decision rationale |
+| `specs/workflow.md` | Complete daily development command reference |
+| `specs/mobile.md` | Real device testing guide (ngrok, Android APK) |
+| `specs/handoff.md` | This document |
+| `docs/e2e-test.sh` | Automated E2E test script — run with `bash docs/e2e-test.sh` |
+
+The repository root also carries `README.md`, `CLAUDE.md` (Claude Code project
+instructions), and `AGENTS.md` (contributor guidelines).
 
 ---
 
@@ -401,7 +414,7 @@ The platform is complete and tested. Possible next steps in priority order:
    stops by optimal driving order when a shift starts
 5. **Dispatcher web app** — a separate Angular web app at `/dispatcher` with a full map
    showing all active couriers, all stops, and the ability to add/reassign stops in real time
-6. **Re-enable Detekt** — when detekt 2.0 stable releases with Kotlin 2.1 support
+6. **Re-enable Detekt** — when detekt 2.0 stable releases with K2 / Kotlin 2.4 support
 
 ---
 
@@ -414,10 +427,13 @@ The platform is complete and tested. Possible next steps in priority order:
    ```
 
 2. At the start of the session, tell Claude Code:
-   > "Read the file `docs/CLAUDE_CODE_CONTEXT.md` before we begin.
+   > "Read the file `specs/handoff.md` before we begin.
    >  This project is a complete courier delivery platform. The context file
    >  explains everything that has been built, all critical decisions, and
    >  known limitations. Use it as the source of truth for project state."
+
+   (`CLAUDE.md` in the repository root is loaded automatically every session and
+   carries the short-form version of the same guidance.)
 
 3. Claude Code will have full filesystem access to read the actual source files
    for any detail not covered in this document.

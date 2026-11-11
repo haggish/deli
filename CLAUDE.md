@@ -29,8 +29,8 @@ docker compose up -d          # Start all local infrastructure
 cd mobile-app
 npm install --legacy-peer-deps
 npm start                                         # Dev server (:8100)
-npm test -- --watch=false --browsers=ChromeHeadless
-npm run lint
+npm test -- --watch=false                         # vitest (not Karma — no --browsers flag)
+npx tsc --noEmit                                  # Type check only
 npm run build:prod
 ```
 
@@ -63,9 +63,11 @@ Deli is a courier delivery platform. Couriers manage daily delivery shifts via m
 - `shared/domain-model` — Kafka event types, domain models, value objects
 - `shared/common-api` — HTTP request/response DTOs, `MdcLoggingFilter`
 
-**Gradle convention plugins** in `buildSrc/` apply uniformly: Java 21 toolchain, ktlint 1.8.0, Kotest + Mockk + TestContainers for tests, Prometheus metrics. Detekt is present but disabled pending 2.0 stable.
+**Gradle convention plugins** in `buildSrc/` apply uniformly: Java 21 toolchain, ktlint 1.8.0, Kotest + Mockk + TestContainers for tests, Prometheus metrics. Detekt is present but disabled pending 2.0 stable. Gradle is 9.5.1 with the configuration cache **enabled** (`org.gradle.configuration-cache=true`) — no `--no-configuration-cache` flag is needed.
 
-**Mobile app** (`mobile-app/`) is Ionic 8 / Angular 19 / Capacitor 6. Feature folders: `auth/`, `courier/`, `customer/`. Shared services in `app/shared/services/`.
+**Mobile app** (`mobile-app/`) is Ionic 9 / Angular 22 / Capacitor 8 / TypeScript 6, on Node 24. Feature folders: `auth/`, `courier/`, `customer/`. Shared services in `app/shared/services/`. Unit tests run on vitest via `@angular/build:unit-test`. `npm run lint` is not wired up — there is no lint target in `angular.json`.
+
+Ionic 9 removed the `@ionic/angular/standalone` subpath; standalone components import from `@ionic/angular` directly.
 
 ## Code Conventions
 
