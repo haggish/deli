@@ -22,7 +22,7 @@ local services with no firewall or router configuration required.
 
 - Android phone with USB debugging enabled, **or** any phone on the same WiFi network
 - A free [ngrok account](https://ngrok.com) (takes 30 seconds to create)
-- All backend services running locally (see `docs/workflow.md`)
+- All backend services running locally (see `specs/workflow.md`)
 - Android Studio installed (only needed for native APK builds)
 
 ---
