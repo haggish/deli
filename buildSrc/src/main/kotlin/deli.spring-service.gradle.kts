@@ -83,3 +83,13 @@ configurations.matching { it.name.contains("detekt") }.configureEach {
         }
     }
 }
+
+// ktlint bundles its own Kotlin compiler; keep Spring dependency management
+// from upgrading it to the project Kotlin version (ABI mismatch crashes ktlint).
+configurations.matching { it.name.startsWith("ktlint") }.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion("2.2.21")
+        }
+    }
+}
