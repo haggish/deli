@@ -24,7 +24,7 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 
 | Phase | What was built | Status |
 |---|---|---|
-| 1 | Monorepo scaffold, Gradle (originally 8.8, now 9.5.1), buildSrc convention plugins, docker-compose | ✅ |
+| 1 | Monorepo scaffold, Gradle (originally 8.8, now 9.9.1), buildSrc convention plugins, docker-compose | ✅ |
 | 2 | Shared domain model — value objects, Kafka events, exceptions, HTTP DTOs | ✅ |
 | 3 | Helm charts — deli-platform (infra) + deli-services (microservices) | ✅ |
 | 4 | JWT authentication in API gateway (login, refresh, R2DBC, Flyway) | ✅ |
@@ -90,9 +90,9 @@ A full-stack courier delivery platform, fully implemented and tested across 10 p
 |---|---|---|
 | Mobile | Ionic / Angular / Capacitor | 9.0.1 / 22.1.4 / 8.3.4 |
 | Mobile toolchain | TypeScript / Node / vitest | 6.0.3 / 24 / 4.1 |
-| Gateway | Spring Cloud Gateway | Spring Boot 4.0.6 |
+| Gateway | Spring Cloud Gateway | Spring Boot 4.1.2 |
 | Services | Kotlin + Spring Boot | 2.4.0 / 4.0.6 |
-| Build | Gradle (Kotlin DSL) | 9.5.1, configuration cache enabled |
+| Build | Gradle (Kotlin DSL) | 9.9.1, configuration cache enabled |
 | Messaging | Apache Kafka (KRaft) | broker 3.7.0, client 3.9.0 |
 | Primary DB | PostgreSQL | 16 |
 | Time-series | TimescaleDB | 2.14 (pg16) |
@@ -134,7 +134,7 @@ without understanding the rationale.
 
 ### Gradle
 
-- **Now on 9.5.1.** The old "must be 8.8, never 8.11+" pin (Kotlin DSL `metadata.bin` bug) no longer applies
+- **Now on 9.9.1.** The old "must be 8.8, never 8.11+" pin (Kotlin DSL `metadata.bin` bug) no longer applies
 - `org.gradle.configuration-cache=true` in `gradle.properties` — the cache is now enabled and working; drop any `--no-configuration-cache` flags you find in older notes
 - No `plugins{}` block in root `build.gradle.kts`
 - `settings.gradle.kts` order: pluginManagement → dependencyResolutionManagement → rootProject.name → include()

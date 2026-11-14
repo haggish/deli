@@ -13,6 +13,10 @@ plugins {
     //id("io.gitlab.arturbosch.detekt")
 }
 
+val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+fun lib(alias: String) = libs.findLibrary(alias).get()
+
 group   = "com.deli"
 version = "1.0.0-SNAPSHOT"
 
@@ -23,9 +27,13 @@ kotlin {
     }
 }
 
+// Override Boot BOM's kotlinx-serialization (1.9.x) so services run the same version
+// shared/domain-model is compiled against.
+extra["kotlin-serialization.version"] = libs.findVersion("kotlinx-serialization").get().requiredVersion
+
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2025.1.1")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${libs.findVersion("spring-cloud").get().requiredVersion}")
     }
 }
 
@@ -34,24 +42,24 @@ dependencies {
     implementation(project(":shared:domain-model"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.3.20")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:2.3.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
+    implementation(lib("kotlin-stdlib"))
+    implementation(lib("kotlin-reflect"))
+    implementation(lib("kotlinx-coroutines-core"))
+    implementation(lib("kotlinx-coroutines-reactor"))
 
     // Observability — every service exposes /actuator/prometheus
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus:1.14.2")
+    implementation(lib("spring-boot-starter-actuator"))
+    runtimeOnly(lib("micrometer-prometheus"))
 
     // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    testImplementation(lib("spring-boot-starter-test")) {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("io.mockk:mockk:1.13.14")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
-    testImplementation("org.testcontainers:testcontainers:1.20.4")
+    testImplementation(lib("kotest-runner-junit5"))
+    testImplementation(lib("kotest-assertions-core"))
+    testImplementation(lib("mockk"))
+    testImplementation(lib("testcontainers-junit5"))
+    testImplementation(lib("testcontainers-core"))
 }
 
 // Docker image name follows convention: deli/<subproject-name>:local
@@ -67,7 +75,7 @@ tasks.bootBuildImage {
 }
 
 ktlint {
-    version.set("1.8.0")
+    version.set(libs.findVersion("ktlint").get().requiredVersion)
     android.set(false)
 }
 
@@ -79,7 +87,7 @@ ktlint {
 configurations.matching { it.name.contains("detekt") }.configureEach {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("2.3.20")
+            useVersion(libs.findVersion("kotlin").get().requiredVersion)
         }
     }
 }

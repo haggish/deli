@@ -5,15 +5,15 @@ plugins {
 description = "Notification service — FCM push notifications via Kafka event consumers"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-kafka")
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.data.redis)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.kafka)
 
     implementation(project(":shared:common-api"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.testcontainers:kafka:1.20.4")
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.testcontainers.kafka)
 }
 
 tasks.jar { enabled = false }
