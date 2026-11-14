@@ -5,27 +5,27 @@ plugins {
 description = "Location service — WebSocket GPS streaming, TimescaleDB, Redis position cache"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.kafka:spring-kafka")
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.websocket)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.redis)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.kafka)
 
-    runtimeOnly("org.postgresql:postgresql:42.7.11")
+    runtimeOnly(libs.postgresql.driver)
 
-    implementation("org.flywaydb:flyway-core:10.22.0")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
+    implementation(libs.flyway.core)
+    runtimeOnly(libs.flyway.postgres)
 
     implementation(project(":shared:common-api"))
     // Spring Kafka still uses Jackson 2.x internally; these explicit versions keep
     // the Kafka producer ObjectMapper on Jackson 2.x while web codecs use Jackson 3.x
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.22.2")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3")
+    implementation(libs.jackson2.module.kotlin)
+    implementation(libs.jackson2.datatype.jsr310)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
-    testImplementation("org.testcontainers:kafka:1.20.4")
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.testcontainers.postgres)
+    testImplementation(libs.testcontainers.kafka)
 }
 
 tasks.jar { enabled = false }

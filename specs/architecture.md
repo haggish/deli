@@ -620,9 +620,9 @@ On a typical commit, Docker pushes only the `application` layer. The first push 
 
 ## 16. Key Technical Decisions
 
-### Gradle 9.5.1
+### Gradle 9.9.1
 
-The project originally pinned Gradle 8.8 because 8.11+ introduced a Kotlin DSL `metadata.bin` serialisation bug. That constraint no longer applies — the wrapper is now on **9.5.1**, running Kotlin 2.4 and Spring Boot 4.0.
+The project originally pinned Gradle 8.8 because 8.11+ introduced a Kotlin DSL `metadata.bin` serialisation bug. That constraint no longer applies — the wrapper is now on **9.9.1**, running Kotlin 2.4 and Spring Boot 4.1.
 
 ### No Detekt
 

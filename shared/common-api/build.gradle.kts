@@ -6,9 +6,11 @@ description = "Shared OpenAPI DTOs and HTTP request/response models"
 
 dependencies {
     api(project(":shared:domain-model"))
-    api("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.springframework:spring-web:7.0.9")
-    implementation("org.springframework:spring-context:7.0.9")
-    implementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
-    implementation("org.slf4j:slf4j-api:2.0.17")
+    api(libs.jakarta.validation.api)
+    // No dependency-management plugin here, so pull Spring versions from the Boot BOM
+    implementation(platform(libs.spring.boot.bom))
+    implementation(libs.spring.web)
+    implementation(libs.spring.context)
+    implementation(libs.jakarta.servlet.api)
+    implementation(libs.slf4j.api)
 }

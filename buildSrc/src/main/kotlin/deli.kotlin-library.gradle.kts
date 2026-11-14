@@ -8,19 +8,23 @@ plugins {
 group   = "com.deli"
 version = "1.0.0-SNAPSHOT"
 
+val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+fun lib(alias: String) = libs.findLibrary(alias).get()
+
 kotlin {
     jvmToolchain(21)
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:2.3.20")
-    api("org.jetbrains.kotlin:kotlin-reflect:2.3.20")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.10.0")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    api(lib("kotlin-stdlib"))
+    api(lib("kotlin-reflect"))
+    api(lib("kotlinx-serialization-core"))
+    api(lib("kotlinx-serialization-json"))
 
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("io.mockk:mockk:1.13.14")
+    testImplementation(lib("kotest-runner-junit5"))
+    testImplementation(lib("kotest-assertions-core"))
+    testImplementation(lib("mockk"))
 }
 
 tasks.test {
@@ -28,6 +32,6 @@ tasks.test {
 }
 
 ktlint {
-    version.set("1.8.0")
+    version.set(libs.findVersion("ktlint").get().requiredVersion)
     android.set(false)
 }

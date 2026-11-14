@@ -30,14 +30,14 @@ route      delivery   location  notification
 | Layer | Technology |
 |---|---|
 | Mobile | Ionic 9 / Angular 22 / Capacitor 8 / TypeScript 6 |
-| Gateway | Spring Cloud Gateway / Spring Boot 4.0 |
-| Services | Kotlin 2.4 / Spring Boot 4.0 |
+| Gateway | Spring Cloud Gateway / Spring Boot 4.1 |
+| Services | Kotlin 2.4 / Spring Boot 4.1 |
 | Messaging | Apache Kafka (KRaft) — broker 3.7, client 3.9 |
 | Primary DB | PostgreSQL 16 |
 | Time-series | TimescaleDB 2.14 |
 | Cache | Redis 7.4 |
 | Object store | MinIO |
-| Build | Gradle 9.5.1 (Kotlin DSL) |
+| Build | Gradle 9.9.1 (Kotlin DSL) |
 | Deploy | Kubernetes / Helm |
 
 ## Prerequisites
