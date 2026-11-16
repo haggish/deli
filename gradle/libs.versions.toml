@@ -4,7 +4,7 @@ spring-boot             = "4.1.1"
 spring-dependency-mgmt  = "1.1.7"
 spring-cloud            = "2025.0.1"
 kotlinx-coroutines      = "1.11.0"
-kotlinx-serialization   = "1.12.0"
+kotlinx-serialization   = "1.13.0"
 
 # Database
 flyway                  = "10.22.0"
