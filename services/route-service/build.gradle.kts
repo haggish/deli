@@ -13,8 +13,8 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql:42.7.11")
 
-    implementation("org.flywaydb:flyway-core:10.22.0")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.22.0")
+    implementation("org.flywaydb:flyway-core:13.12.2")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:13.12.2")
 
     implementation(project(":shared:common-api"))
     // Spring Kafka still uses Jackson 2.x internally; these explicit versions keep
