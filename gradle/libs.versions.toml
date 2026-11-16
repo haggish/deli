@@ -7,7 +7,7 @@ kotlinx-coroutines      = "1.11.0"
 kotlinx-serialization   = "1.12.0"
 
 # Database
-flyway                  = "10.22.0"
+flyway                  = "13.12.2"
 postgresql              = "42.7.11"
 timescaledb             = "42.7.4"        # same JDBC driver, different schema
 hikari                  = "7.1.0"
