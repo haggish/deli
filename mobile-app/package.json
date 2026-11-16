@@ -28,7 +28,7 @@
     "@capacitor/status-bar": "^8.0.4",
     "@ionic/angular": "^9.0.10",
     "@ionic/angular-toolkit": "^13.0.0",
-    "@types/leaflet": "^1.9.21",
+    "@types/leaflet": "^1.9.22",
     "ionicons": "^8.0.13",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
